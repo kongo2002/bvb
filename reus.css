@@ -25,6 +25,10 @@ div#legend {
     float: right;
 }
 
+div#scores {
+    float: left;
+}
+
 .activerow {
     background: #eee;
 }
@@ -41,4 +45,15 @@ div#legend {
 
 .currency {
     text-align: right;
+}
+
+.footer {
+    padding-top: 1em;
+    text-align: center;
+    clear: both;
+}
+
+.copyright {
+    font-size: 70%;
+    color: #ccc;
 }
