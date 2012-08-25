@@ -45,6 +45,9 @@ var MatchType = {
  */
 function Reus() {
 
+    /* transfer sum */
+    this.transferSum = 17500000;
+
     /* list of games */
     var games = this.games = [];
 
@@ -102,7 +105,7 @@ Reus.prototype.insertScores = function(table) {
         return $('<tr><td>' + game.date.toLocaleDateString() + '</td>' +
                  '<td>' + game.game + '</td>' +
                  '<td>' + game.result + '</td>' +
-                 '<td>' + toCurrency(game.score) + '</td></tr>');
+                 '<td class="currency">' + toCurrency(game.score) + '</td></tr>');
     }
 
     var sum = 0;
@@ -119,8 +122,13 @@ Reus.prototype.insertScores = function(table) {
         table.append(row);
     });
 
-    table.append('<tr class="summary"><td colspan="3"></td><td>' +
-            toCurrency(sum) + '</td></tr>');
+    /* add acquired score row */
+    table.append('<tr class="summary"><td colspan="3">Acquired score:</td>' +
+            '<td class="currency">' + toCurrency(sum) + '</td></tr>');
+
+    /* add remaining score/money row */
+    table.append('<tr class="summary"><td colspan="3">Remaining:</td>' +
+            '<td class="currency">' + toCurrency(this.transferSum - sum) + '</td></tr>');
 };
 
 /**

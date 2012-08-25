@@ -39,3 +39,6 @@ div#legend {
     padding-bottom: 5px;
 }
 
+.currency {
+    text-align: right;
+}
