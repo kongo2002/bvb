@@ -1,4 +1,7 @@
-/* various gametypes and their scores */
+/**
+ * Enumeration containing all different match types
+ * and their scores
+ */
 var MatchType = {
     Bundesliga : {
         name : 'Bundesliga',
@@ -37,6 +40,9 @@ var MatchType = {
     }
 }
 
+/**
+ * Class encapsulating all major functionality
+ */
 function Reus() {
 
     /* list of games */
@@ -117,7 +123,9 @@ Reus.prototype.insertScores = function(table) {
             toCurrency(sum) + '</td></tr>');
 };
 
-/* document's onload callback */
+/**
+ * Document's OnLoad callback
+ */
 $(function() {
     /* initialize new Reus instance */
     var reus = new Reus();
