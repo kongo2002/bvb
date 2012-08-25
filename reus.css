@@ -1,0 +1,41 @@
+body {
+    color: #111;
+}
+
+table {
+    border: solid #ccc 1px;
+}
+
+td {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+th {
+    background: #ccc;
+    padding: 5px;
+}
+
+th.subheader {
+    background: #dfdfdf;
+}
+
+div#legend {
+    font-size: 80%;
+    float: right;
+}
+
+.activerow {
+    background: #eee;
+}
+
+.summary {
+    background: #dfdfdf;
+    font-weight: bold;
+}
+
+.summary td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
