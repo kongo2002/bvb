@@ -108,6 +108,11 @@ Reus.prototype.insertScores = function(table) {
                  '<td class="currency">' + toCurrency(game.score) + '</td></tr>');
     }
 
+    var buildSummary = function(description, sum) {
+        return '<tr class="summary"><td colspan="3">' + description + '</td>' +
+            '<td class="currency">' + toCurrency(sum) + '</td></tr>';
+    }
+
     var sum = 0;
     this.games.sort(byDate).forEach(function(game) {
         var row = buildRow(game);
@@ -123,12 +128,10 @@ Reus.prototype.insertScores = function(table) {
     });
 
     /* add acquired score row */
-    table.append('<tr class="summary"><td colspan="3">Acquired score:</td>' +
-            '<td class="currency">' + toCurrency(sum) + '</td></tr>');
+    table.append(buildSummary('Acquired score:', sum));
 
     /* add remaining score/money row */
-    table.append('<tr class="summary"><td colspan="3">Remaining:</td>' +
-            '<td class="currency">' + toCurrency(this.transferSum - sum) + '</td></tr>');
+    table.append(buildSummary('Remaining:', this.transferSum - sum));
 };
 
 /**
