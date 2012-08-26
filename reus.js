@@ -41,6 +41,36 @@ var MatchType = {
 }
 
 /**
+ * Various helper functions
+ */
+var Helpers = {
+    /* return a Date object based on the given date elements */
+    day : function(year, month, day) {
+        var date = new Date(year, month, day, 0, 0, 0, 0);
+        return date;
+    },
+
+    /* sorting function */
+    byDate : function(one, two) {
+        if (one.date < two.date)
+            return -1;
+        return 1;
+    },
+
+    /* number to currency conversion */
+    toCurrency : function(number) {
+        var strNumber = number.toString();
+
+        if (strNumber.length > 3)
+            strNumber = strNumber.split('').reverse().reduce(function(acc, num, i) {
+                return num + (i && !(i%3) ? ',' : '') + acc;
+            });
+
+        return strNumber + ' €';
+    }
+}
+
+/**
  * Class encapsulating all major functionality
  */
 function Reus() {
@@ -71,50 +101,38 @@ function Reus() {
         });
     }
 
-    /* return a Date object based on the given date elements */
-    var day = function(year, month, day) {
-        var date = new Date(year, month, day, 0, 0, 0, 0);
-        return date;
-    }
-
     /* add all available games */
-    addGame(day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
-    addGame(day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true);
+    addGame(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
+    addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true);
 }
 
+Reus.prototype.getDevelopment = function() {
+    var data = [];
+
+    this.games.forEach(function(match) {
+        data.push([match.date, match.score]);
+    });
+
+    return data;
+};
+
 Reus.prototype.insertScores = function(table) {
-    /* sorting function */
-    var byDate = function(one, two) {
-        if (one.date < two.date)
-            return -1;
-        return 1;
-    }
-
-    var toCurrency = function(number) {
-        var strNumber = number.toString();
-
-        if (strNumber.length > 3)
-            strNumber = strNumber.split('').reverse().reduce(function(acc, num, i) {
-                return num + (i && !(i%3) ? ',' : '') + acc;
-            });
-
-        return strNumber + ' €';
-    }
-
+    /* build a score table row */
     var buildRow = function(game) {
         return $('<tr><td>' + game.date.toLocaleDateString() + '</td>' +
                  '<td>' + game.game + '</td>' +
                  '<td>' + game.result + '</td>' +
-                 '<td class="currency">' + toCurrency(game.score) + '</td></tr>');
+                 '<td class="currency">' + Helpers.toCurrency(game.score) + '</td></tr>');
     }
 
+    /* build a summary table row */
     var buildSummary = function(description, sum) {
         return '<tr class="summary"><td colspan="3">' + description + '</td>' +
-            '<td class="currency">' + toCurrency(sum) + '</td></tr>';
+            '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
     var sum = 0;
-    this.games.sort(byDate).forEach(function(game) {
+    this.games.sort(Helpers.byDate).forEach(function(game) {
         var row = buildRow(game);
 
         /* add mouse hover */
@@ -144,6 +162,22 @@ $(function() {
     /* insert all scores into table */
     reus.insertScores($('#scores table'));
 
+    /* draw chart */
+    $.plot($('#chart'), [{
+        data : reus.getDevelopment(),
+        points : { show : true },
+        lines : { show : true },
+        label : 'Score',
+        shadowSize : 0,
+    }],
+    {
+        xaxis : { mode : 'time' },
+        yaxis : { tickFormatter : function(value, axis) {
+            return Helpers.toCurrency(value); }
+        }
+    });
+
     /* remove all script tags from html */
     $('script').remove();
+
 });

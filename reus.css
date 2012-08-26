@@ -57,3 +57,8 @@ div#scores {
     font-size: 70%;
     color: #ccc;
 }
+
+div#chart {
+    width: 400px;
+    height: 300px;
+}
