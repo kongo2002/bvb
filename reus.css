@@ -1,5 +1,6 @@
 body {
     color: #111;
+    font-family: 'Palatino', 'Palatino Linotype', 'Georgia', serif;
 }
 
 table {
@@ -27,6 +28,11 @@ div#legend {
 
 div#scores {
     float: left;
+}
+
+div#chart {
+    width: 400px;
+    height: 300px;
 }
 
 .activerow {
@@ -58,7 +64,22 @@ div#scores {
     color: #ccc;
 }
 
-div#chart {
-    width: 400px;
-    height: 300px;
+.row {
+    cursor: pointer;
 }
+
+.detail {
+    padding-top: 3px;
+    padding-left: 2em;
+    font-size: 90%;
+    color: #666;
+}
+
+.detail span {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}
+

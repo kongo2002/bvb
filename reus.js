@@ -97,7 +97,10 @@ function Reus() {
             'date' : date,
             'game' : game,
             'result' : result,
-            'score' : score
+            'score' : score,
+            'type' : mType,
+            'goals' : goals,
+            'assists' : assists
         });
     }
 
@@ -118,11 +121,32 @@ Reus.prototype.getDevelopment = function() {
 
 Reus.prototype.insertScores = function(table) {
     /* build a score table row */
-    var buildRow = function(game) {
-        return $('<tr><td>' + game.date.toLocaleDateString() + '</td>' +
-                 '<td>' + game.game + '</td>' +
-                 '<td>' + game.result + '</td>' +
-                 '<td class="currency">' + Helpers.toCurrency(game.score) + '</td></tr>');
+    var buildRow = function(match) {
+        return $('<tr class="row"><td>' + match.date.toLocaleDateString() + '</td>' +
+                 '<td>' + match.game + '</td>' +
+                 '<td>' + match.result + '</td>' +
+                 '<td class="currency">' + Helpers.toCurrency(match.score) + '</td></tr>');
+    }
+
+    /* build a match's detail view */
+    var buildDetail = function(match) {
+        var detail = '<tr class="hidden"><td class="detail" colspan="4">' +
+            '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
+
+        if (match.goals)
+            detail += '<div class="detailRow">Goals: ' + match.goals + ' * ' +
+                Helpers.toCurrency(match.type.goal) + ' = ' +
+                Helpers.toCurrency(match.goals * match.type.goal) + '</div>';
+
+        if (match.assists)
+            detail += '<div class="detailRow">Assists: ' + match.assists + ' * ' +
+                Helpers.toCurrency(match.type.assist) + ' = ' +
+                Helpers.toCurrency(match.assists * match.type.assist) + '</div>';
+
+        /* TODO: bonus scores */
+
+        detail += '</td></tr>';
+        return $(detail);
     }
 
     /* build a summary table row */
@@ -134,15 +158,20 @@ Reus.prototype.insertScores = function(table) {
     var sum = 0;
     this.games.sort(Helpers.byDate).forEach(function(game) {
         var row = buildRow(game);
+        var detail = buildDetail(game);
 
         /* add mouse hover */
         var toggle = function() { row.toggleClass('activerow'); }
         row.on('mouseenter', toggle);
         row.on('mouseleave', toggle);
 
+        /* add detail handler */
+        row.on('click', function() { detail.toggleClass('hidden'); });
+
         sum = sum + game.score;
 
         table.append(row);
+        table.append(detail);
     });
 
     /* add acquired score row */
@@ -163,7 +192,7 @@ $(function() {
     reus.insertScores($('#scores table'));
 
     /* draw chart */
-    $.plot($('#chart'), [{
+    var chart = $.plot($('#chart'), [{
         data : reus.getDevelopment(),
         points : { show : true },
         lines : { show : true },
@@ -172,9 +201,12 @@ $(function() {
     }],
     {
         xaxis : { mode : 'time' },
-        yaxis : { tickFormatter : function(value, axis) {
-            return Helpers.toCurrency(value); }
-        }
+        yaxis : {
+            tickFormatter : function(value, axis) {
+                return Helpers.toCurrency(value);
+            },
+            min : 0
+        },
     });
 
     /* remove all script tags from html */
