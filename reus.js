@@ -109,7 +109,7 @@ function Reus() {
 Reus.prototype.getDevelopment = function() {
     var data = [];
 
-    this.games.forEach(function(match) {
+    this.games.sort(Helpers.byDate).forEach(function(match) {
         data.push([match.date, match.score]);
     });
 
