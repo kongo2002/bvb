@@ -76,7 +76,7 @@ var Helpers = {
 function Reus() {
 
     /* transfer sum */
-    this.transferSum = 17500000;
+    this.transferSum = 17100000;
 
     /* list of games */
     var games = this.games = [];
