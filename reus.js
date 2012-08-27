@@ -82,7 +82,7 @@ function Reus() {
     var games = this.games = [];
 
     /* build a game object based on the given result and match type */
-    var addGame = function(date, opponent, result, goals, assists, homegame, matchType) {
+    var addGame = function(date, opponent, result, goals, assists, homegame, matchType, bonus) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
         var game = homegame
@@ -93,6 +93,14 @@ function Reus() {
         var mType = MatchType[matchType];
         var score = mType.goal * goals + mType.assist * assists;
 
+        if (bonus) {
+            /* TODO: make this consts */
+            if (bonus.multiplier)
+                score *= 2;
+            if (bonus.potd)
+                score += 200000;
+        }
+
         games.push({
             'date' : date,
             'game' : game,
@@ -100,7 +108,8 @@ function Reus() {
             'score' : score,
             'type' : mType,
             'goals' : goals,
-            'assists' : assists
+            'assists' : assists,
+            'bonus' : bonus
         });
     }
 
@@ -143,7 +152,15 @@ Reus.prototype.insertScores = function(table) {
                 Helpers.toCurrency(match.type.assist) + ' = ' +
                 Helpers.toCurrency(match.assists * match.type.assist) + '</div>';
 
-        /* TODO: bonus scores */
+        if (match.bonus) {
+            if (match.bonus.multiplier)
+                detail += '<div class="detailRow">' + match.bonus.multiplier + ' (* 2) = ' +
+                    Helpers.toCurrency(match.type.goal * match.goals + match.type.assist * match.assists) +
+                    '</div>';
+            if (match.bonus.potd)
+                detail += '<div class="detailRow">Kicker Player of the Day = ' +
+                    Helpers.toCurrency(200000) + '</div>';
+        }
 
         detail += '</td></tr>';
         return $(detail);
