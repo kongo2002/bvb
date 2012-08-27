@@ -41,6 +41,24 @@ var MatchType = {
 }
 
 /**
+ * Various bonus score rules
+ */
+var Bonus = {
+    Schalke : {
+        name : 'Schalke 04',
+        bonus : function(value) { return value; }
+    },
+    Bayern : {
+        name : 'Bayern München',
+        bonus : function(value) { return value; }
+    },
+    POTD : {
+        name : 'Kicker Player of the Day',
+        bonus : function(value) { return 200000; }
+    }
+}
+
+/**
  * Various helper functions
  */
 var Helpers = {
@@ -93,13 +111,8 @@ function Reus() {
         var mType = MatchType[matchType];
         var score = mType.goal * goals + mType.assist * assists;
 
-        if (bonus) {
-            /* TODO: make this consts */
-            if (bonus.multiplier)
-                score *= 2;
-            if (bonus.potd)
-                score += 200000;
-        }
+        if (bonus)
+            bonus.forEach(function(b) { score += b.bonus(score); });
 
         games.push({
             'date' : date,
@@ -139,27 +152,33 @@ Reus.prototype.insertScores = function(table) {
 
     /* build a match's detail view */
     var buildDetail = function(match) {
+        var score = 0;
         var detail = '<tr class="hidden"><td class="detail" colspan="4">' +
             '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
 
-        if (match.goals)
+        if (match.goals) {
+            var value = match.goals * match.type.goal;
+            score += value;
+
             detail += '<div class="detailRow">Goals: ' + match.goals + ' * ' +
                 Helpers.toCurrency(match.type.goal) + ' = ' +
-                Helpers.toCurrency(match.goals * match.type.goal) + '</div>';
+                Helpers.toCurrency(value) + '</div>';
+        }
 
-        if (match.assists)
+        if (match.assists) {
+            var value = match.assists * match.type.assist;
+            score += value;
+
             detail += '<div class="detailRow">Assists: ' + match.assists + ' * ' +
                 Helpers.toCurrency(match.type.assist) + ' = ' +
-                Helpers.toCurrency(match.assists * match.type.assist) + '</div>';
+                Helpers.toCurrency(value) + '</div>';
+        }
 
         if (match.bonus) {
-            if (match.bonus.multiplier)
-                detail += '<div class="detailRow">' + match.bonus.multiplier + ' (* 2) = ' +
-                    Helpers.toCurrency(match.type.goal * match.goals + match.type.assist * match.assists) +
-                    '</div>';
-            if (match.bonus.potd)
-                detail += '<div class="detailRow">Kicker Player of the Day = ' +
-                    Helpers.toCurrency(200000) + '</div>';
+            match.bonus.forEach(function(b) {
+                detail += '<div class="detailRow">' + b.name + ' = ' +
+                    Helpers.toCurrency(b.bonus(score)) + '</div>';
+            });
         }
 
         detail += '</td></tr>';
