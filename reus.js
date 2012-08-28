@@ -131,14 +131,26 @@ function Reus() {
     addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true);
 }
 
-Reus.prototype.getDevelopment = function() {
+Reus.prototype._get = function(selector) {
     var data = [];
 
     this.games.sort(Helpers.byDate).forEach(function(match) {
-        data.push([match.date, match.score]);
+        data.push([match.date, selector(match)]);
     });
 
     return data;
+};
+
+Reus.prototype.getScores = function() {
+    return this._get(function(elem) { return elem.score; });
+};
+
+Reus.prototype.getGoals = function() {
+    return this._get(function(elem) { return elem.goals; });
+};
+
+Reus.prototype.getAssists = function() {
+    return this._get(function(elem) { return elem.assists; });
 };
 
 Reus.prototype.insertScores = function(table) {
@@ -229,21 +241,51 @@ $(function() {
 
     /* draw chart */
     var chart = $.plot($('#chart'), [{
-        data : reus.getDevelopment(),
-        color : 'rgb(242,188,0)',
+        data : reus.getScores(),
+        yaxis : 1,
+        color : '#06003d',
         points : { show : true },
         lines : { show : true },
-        label : 'Score',
+        label : 'Score (in €)',
+        shadowSize : 0
+    }, {
+        data : reus.getGoals(),
+        yaxis : 2,
+        color : '#f8d763',
+        points : { show : true },
+        lines : { show : true },
         shadowSize : 0,
+        label : 'Goals'
+    }, {
+        data : reus.getAssists(),
+        yaxis : 2,
+        color : '#584400',
+        points : { show : true },
+        lines : { show : true },
+        shadowSize : 0,
+        label : 'Assists'
     }],
     {
+        grid : { hoverable : true },
         xaxis : { mode : 'time' },
-        yaxis : {
+        yaxis : { min : 0 },
+        yaxes : [{
             tickFormatter : function(value, axis) {
                 return Helpers.toCurrency(value);
-            },
-            min : 0
-        },
+            }
+        }, {
+            position : 'right'
+        }]
+    });
+
+    $('tr.row').each(function(i) {
+        var elem = $(this);
+        elem.on('mouseenter', function() {
+            chart.highlight(0, i);
+            chart.highlight(1, i);
+            chart.highlight(2, i);
+        });
+        elem.on('mouseleave', function() { chart.unhighlight(); });
     });
 
     /* remove all script tags from html */
