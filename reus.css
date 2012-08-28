@@ -1,10 +1,18 @@
 body {
-    color: #111;
+    color: #000;
     font-family: 'Palatino', 'Palatino Linotype', 'Georgia', serif;
 }
 
+h1 {
+    color: #06003d;
+}
+
+h2, h3, h4, h5, h6 {
+    color: #1608a9;
+}
+
 table {
-    border: solid #ccc 1px;
+    border: solid #302c5c 1px;
 }
 
 td {
@@ -13,12 +21,14 @@ td {
 }
 
 th {
-    background: #ccc;
+    background: #06003d;
+    color: #ffd973;
     padding: 5px;
 }
 
 th.subheader {
-    background: #dfdfdf;
+    background: #1608a9;
+    color: #ffd973;
 }
 
 div#legend {
@@ -36,12 +46,13 @@ div#chart {
 }
 
 .activerow {
-    background: #eee;
+    background: #f8d763;
 }
 
 .summary {
-    background: #dfdfdf;
+    background: #1608a9;
     font-weight: bold;
+    color: #ffd973;
 }
 
 .summary td {
@@ -61,7 +72,7 @@ div#chart {
 
 .copyright {
     font-size: 70%;
-    color: #ccc;
+    color: #84743c;
 }
 
 .row {
@@ -72,7 +83,7 @@ div#chart {
     padding-top: 3px;
     padding-left: 2em;
     font-size: 90%;
-    color: #666;
+    color: #06003d;
 }
 
 .detail span {

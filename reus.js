@@ -230,6 +230,7 @@ $(function() {
     /* draw chart */
     var chart = $.plot($('#chart'), [{
         data : reus.getDevelopment(),
+        color : 'rgb(242,188,0)',
         points : { show : true },
         lines : { show : true },
         label : 'Score',
