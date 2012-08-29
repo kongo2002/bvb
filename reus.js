@@ -53,8 +53,12 @@ var Bonus = {
         bonus : function(value) { return value; }
     },
     POTD : {
-        name : 'Kicker Player of the Day',
+        name : 'Kicker Player of the day',
         bonus : function(value) { return 200000; }
+    },
+    TOTD : {
+        name : 'Kicker Team of the day',
+        bonus : function(value) { return 25000; }
     }
 }
 
@@ -128,7 +132,7 @@ function Reus() {
 
     /* add all available games */
     addGame(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
-    addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true);
+    addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true, 'Bundesliga', [ Bonus.TOTD ]);
 }
 
 Reus.prototype._get = function(selector) {
