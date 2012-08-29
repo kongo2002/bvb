@@ -198,8 +198,9 @@ Reus.prototype.insertScores = function(table) {
     }
 
     /* build a summary table row */
-    var buildSummary = function(description, sum) {
-        return '<tr class="summary"><td colspan="3">' + description + '</td>' +
+    var buildSummary = function(description, sum, title) {
+        var tip = title || '';
+        return '<tr class="summary" title="' + tip + '"><td colspan="3">' + description + '</td>' +
             '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
@@ -226,7 +227,9 @@ Reus.prototype.insertScores = function(table) {
     table.append(buildSummary('Acquired score:', sum));
 
     /* add remaining score/money row */
-    table.append(buildSummary('Remaining:', this.transferSum - sum));
+    table.append(buildSummary('Remaining:', this.transferSum - sum,
+                'Remaining score til reaching the transfer amount of ' +
+                Helpers.toCurrency(this.transferSum)));
 };
 
 /**
@@ -243,7 +246,7 @@ $(function() {
     var chart = $.plot($('#chart'), [{
         data : reus.getScores(),
         yaxis : 1,
-        color : '#06003d',
+        color : '#f2bc00',
         points : { show : true },
         lines : { show : true },
         label : 'Score (in €)',
@@ -267,6 +270,7 @@ $(function() {
     }],
     {
         grid : { hoverable : true },
+        legend : { backgroundOpacity : 0.25 },
         xaxis : { mode : 'time' },
         yaxis : { min : 0 },
         yaxes : [{
@@ -278,6 +282,8 @@ $(function() {
         }]
     });
 
+    /* highlight the data points of the match row that
+     * is currently being hovered over */
     $('tr.row').each(function(i) {
         var elem = $(this);
         elem.on('mouseenter', function() {
