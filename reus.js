@@ -209,23 +209,23 @@ function Reus() {
 
         /* process player's goals */
         if (goals) {
-            goals.forEach(function(goal) { Players[goal].addGoal(); });
+            goals.forEach(function(goal) { Players[goal].addGoal(date); });
         }
 
         /* process player's assists */
         if (assists) {
-            assists.forEach(function(assist) { Players[assist].addAssist(); });
+            assists.forEach(function(assist) { Players[assist].addAssist(date); });
         }
 
         games.push({
-            'date' : date,
-            'game' : game,
-            'result' : result,
-            'score' : score,
-            'type' : mType,
-            'goals' : goalCount,
-            'assists' : assistCount,
-            'bonus' : bonus
+            date : date,
+            game : game,
+            result : result,
+            score : score,
+            type : mType,
+            goals : goalCount,
+            assists : assistCount,
+            bonus : bonus
         });
     }
 
