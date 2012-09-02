@@ -183,46 +183,51 @@ var Abwehr = getPlayer(Position.A);
 var Mittelfeld = getPlayer(Position.M);
 var Sturm = getPlayer(Position.S);
 
-var Players = {
-    Team : new Player('Borussia Dortmund', 'Team', Position.Q),
+/**
+ * @constructor
+ *
+ * All players of Borussia Dortmund
+ */
+function Players() {
+    this.Team = new Player('Borussia Dortmund', 'Team', Position.Q);
 
-    Alomerovic : Torwart('Alomerovic', 'Zlatan'),
-    Langerak : Torwart('Langerak', 'Mitchell'),
-    Weidenfeller : Torwart('Weidenfeller', 'Roman'),
+    this.Alomerovic = Torwart('Alomerovic', 'Zlatan');
+    this.Langerak = Torwart('Langerak', 'Mitchell');
+    this.Weidenfeller = Torwart('Weidenfeller', 'Roman');
 
-    Santana : Abwehr('Santana', 'Felipe'),
-    Hummels : Abwehr('Hummels', 'Mats'),
-    Kirch : Abwehr('Kirch', 'Oliver', 350000),
-    Löwe : Abwehr('Löwe', 'Chris'),
-    Owomoyela : Abwehr('Owomoyela', 'Patrick'),
-    Piszczek : Abwehr('Piszczek', 'Lukasz'),
-    Schmelzer : Abwehr('Schmelzer', 'Marcel'),
-    Subotic : Abwehr('Subotic', 'Neven'),
+    this.Santana = Abwehr('Santana', 'Felipe');
+    this.Hummels = Abwehr('Hummels', 'Mats');
+    this.Kirch = Abwehr('Kirch', 'Oliver', 350000);
+    this.Löwe = Abwehr('Löwe', 'Chris');
+    this.Owomoyela = Abwehr('Owomoyela', 'Patrick');
+    this.Piszczek = Abwehr('Piszczek', 'Lukasz');
+    this.Schmelzer = Abwehr('Schmelzer', 'Marcel');
+    this.Subotic = Abwehr('Subotic', 'Neven');
 
-    Amini : Mittelfeld('Amini', 'Mustafa'),
-    Bender : Mittelfeld('Bender', 'Sven'),
-    Bittencourt : Mittelfeld('Bittencourt', 'Leonardo'),
-    Blaszczykowski : Mittelfeld('Blaszczykowski', 'Jakub'),
-    Götze : Mittelfeld('Götze', 'Mario'),
-    Grosskreutz : Mittelfeld('Grosskreutz', 'Kevin'),
-    Gündogan : Mittelfeld('Gündogan', 'Ilkay'),
-    Kehl : Mittelfeld('Kehl', 'Sebastian'),
-    Leitner : Mittelfeld('Leitner', 'Moritz'),
-    Perisic : Mittelfeld('Perisic', 'Ivan'),
-    Reus : Mittelfeld('Reus', 'Marco', 17100000),
+    this.Amini = Mittelfeld('Amini', 'Mustafa');
+    this.Bender = Mittelfeld('Bender', 'Sven');
+    this.Bittencourt = Mittelfeld('Bittencourt', 'Leonardo');
+    this.Blaszczykowski = Mittelfeld('Blaszczykowski', 'Jakub');
+    this.Götze = Mittelfeld('Götze', 'Mario');
+    this.Grosskreutz = Mittelfeld('Grosskreutz', 'Kevin');
+    this.Gündogan = Mittelfeld('Gündogan', 'Ilkay');
+    this.Kehl = Mittelfeld('Kehl', 'Sebastian');
+    this.Leitner = Mittelfeld('Leitner', 'Moritz');
+    this.Perisic = Mittelfeld('Perisic', 'Ivan');
+    this.Reus = Mittelfeld('Reus', 'Marco', 17100000);
 
-    Ducksch : Sturm('Ducksch', 'Marvin'),
-    Lewandowski : Sturm('Lewandowski', 'Robert'),
-    Schieber : Sturm('Schieber', 'Julian', 5500000),
+    this.Ducksch = Sturm('Ducksch', 'Marvin');
+    this.Lewandowski = Sturm('Lewandowski', 'Robert');
+    this.Schieber = Sturm('Schieber', 'Julian', 5500000);
+}
 
-    forEach : function(func) {
-        var i = 0;
-        for (var name in this) {
-            var player = this[name];
-            if (typeof player !== 'function') {
-                func.call(player, player, i, name);
-                i += 1;
-            }
+Players.prototype.forEach = function(func) {
+    var i = 0;
+    for (var name in this) {
+        var player = this[name];
+        if (typeof player !== 'function') {
+            func.call(player, player, i, name);
+            i += 1;
         }
     }
 }
@@ -234,8 +239,13 @@ var Players = {
  */
 function BVB() {
 
+    var self = this;
+
+    /* initialize players */
+    this.players = new Players();
+
     /* list of games */
-    var games = this.games = [];
+    this.games = [];
 
     /* build a game object based on the given result and match type */
     var addMatch = function(date, opponent, result, scores, homegame, matchType) {
@@ -264,7 +274,7 @@ function BVB() {
 
         var overall = buildMatch();
 
-        Players.forEach(function(player, i, name) {
+        self.players.forEach(function(player, i, name) {
             /* create an empty match object */
             var match = buildMatch();
 
@@ -310,8 +320,8 @@ function BVB() {
                 player.addMatch(match);
         });
 
-        Players.Team.addMatch(overall);
-        games.push(overall);
+        self.players.Team.addMatch(overall);
+        self.games.push(overall);
     }
 
     /* add all available matches */
@@ -354,7 +364,7 @@ BVB.prototype.insertPlayers = function(scores) {
     var self = this;
     var list = $('<ul class="navigation"></ul>');
 
-    Players.forEach(function(player, i, name) {
+    this.players.forEach(function(player, i, name) {
         var id = '#tab' + i;
         var position = player.position.toString().toLowerCase();
 
@@ -490,7 +500,7 @@ BVB.prototype.insertScores = function(scores) {
         });
     }
 
-    Players.forEach(function(player, i) {
+    this.players.forEach(function(player, i) {
         /* player's score div */
         var div = $('<div id="tab' + i + '" class="player"></div>');
 
