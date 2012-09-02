@@ -133,6 +133,7 @@ function Reus() {
     /* add all available games */
     addGame(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
     addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true, 'Bundesliga', [ Bonus.TOTD ]);
+    addGame(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', 0, 0);
 }
 
 Reus.prototype._get = function(selector) {
