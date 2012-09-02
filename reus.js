@@ -6,37 +6,37 @@ var MatchType = {
     Bundesliga : {
         name : 'Bundesliga',
         goal : 100000,
-        assist : 50000,
+        assist : 50000
     },
     Pokal : {
         name : 'Pokal',
         goal : 150000,
-        assist : 50000,
+        assist : 50000
     },
     CLGroupPhase : {
         name : 'Champions League - Group phase',
         goal : 250000,
-        assist : 100000,
+        assist : 100000
     },
     CL16 : {
         name : 'Champions League - Round of 16',
         goal : 350000,
-        assist : 200000,
+        assist : 200000
     },
     CL8 : {
         name : 'Champions League - Quarter finals',
         goal : 500000,
-        assist : 250000,
+        assist : 250000
     },
     CL4 : {
         name : 'Champions League - Semi finals',
         goal : 750000,
-        assist : 400000,
+        assist : 400000
     },
     CLFinal : {
         name : 'Champions League - Final',
         goal : 800000,
-        assist : 500000,
+        assist : 500000
     }
 }
 
@@ -92,7 +92,73 @@ var Helpers = {
     }
 }
 
+var Position = {
+    T : 'Torwart',
+    A : 'Abwehr',
+    M : 'Mittelfeld',
+    S : 'Sturm'
+}
+
 /**
+ * @constructor
+ *
+ * Class describing a player
+ */
+function Player(name, firstName, position) {
+    this.name = name;
+    this.firstName = firstName;
+    this.position = position;
+    this.goals = [];
+    this.assists = [];
+    this.goalCount = function() { return this.goals.length; }
+    this.assistCount = function() { return this.goals.length; }
+}
+
+var getPlayer = function(position) {
+    return function(name, firstName) {
+        return new Player(name, firstName, position);
+    }
+}
+
+var Torwart = getPlayer(Position.T);
+var Abwehr = getPlayer(Position.A);
+var Mittelfeld = getPlayer(Position.M);
+var Sturm = getPlayer(Position.S);
+
+var Players = {
+    Alomerovic : Torwart('Alomerovic', 'Zlatan'),
+    Langerak : Torwart('Langerak', 'Mitchell'),
+    Weidenfeller : Torwart('Weidenfeller', 'Roman'),
+
+    Santana : Abwehr('Santana', 'Felipe'),
+    Hummels : Abwehr('Hummels', 'Mats'),
+    Kirch : Abwehr('Kirch', 'Oliver'),
+    Löwe : Abwehr('Löwe', 'Chris'),
+    Owomoyela : Abwehr('Owomoyela', 'Patrick'),
+    Piszczek : Abwehr('Piszczek', 'Lukasz'),
+    Schmelzer : Abwehr('Schmelzer', 'Marcel'),
+    Subotic : Abwehr('Subotic', 'Neven'),
+
+    Amini : Mittelfeld('Amini', 'Mustafa'),
+    Bender : Mittelfeld('Bender', 'Sven'),
+    Bittencourt : Mittelfeld('Bittencourt', 'Leonardo'),
+    Blaszczykowski : Mittelfeld('Blaszczykowski', 'Jakub'),
+    Götze : Mittelfeld('Götze', 'Mario'),
+    Grosskreutz : Mittelfeld('Grosskreutz', 'Kevin'),
+    Gündogan : Mittelfeld('Gündogan', 'Ilkay'),
+    Kehl : Mittelfeld('Kehl', 'Sebastian'),
+    Leitner : Mittelfeld('Leitner', 'Moritz'),
+    Perisic : Mittelfeld('Perisic', 'Ivan'),
+    Reus : Mittelfeld('Reus', 'Marco'),
+
+    Ducksch : Sturm('Ducksch', 'Marvin'),
+    Lewandowski : Sturm('Lewandowski', 'Robert'),
+    Schieber : Sturm('Schieber', 'Julian')
+}
+
+/**
+ * @constructor
+ *
  * Class encapsulating all major functionality
  */
 function Reus() {
