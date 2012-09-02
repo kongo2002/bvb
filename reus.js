@@ -338,7 +338,19 @@ function BVB() {
         });
 }
 
+BVB.prototype.activatePlayer = function(scores, link, id) {
+    return function() {
+        scores.find('div.player').addClass('hidden');
+        scores.find('ul.navigation li').removeClass('activetab');
+
+        link.addClass('activetab');
+
+        scores.find(id).removeClass('hidden');
+    }
+}
+
 BVB.prototype.insertPlayers = function(scores) {
+    var self = this;
     var list = $('<ul class="navigation"></ul>');
 
     Players.forEach(function(player, i, name) {
@@ -346,19 +358,10 @@ BVB.prototype.insertPlayers = function(scores) {
         var position = player.position.toString().toLowerCase();
 
         var link = $('<li class="' + position + ' tab'
-            + '"><a href="'+id+'">' + name
+            + '" id="nav'+i+'"><a href="'+id+'">' + name
             + '</a></li>');
 
-        link.on('click', function() {
-            var all = scores.find('div.player');
-            all.addClass('hidden');
-
-            scores.find('ul.navigation li').removeClass('activetab');
-            link.addClass('activetab');
-
-            var active = scores.find(id);
-            active.removeClass('hidden');
-        });
+        link.on('click', self.activatePlayer(scores, link, id));
 
         list.append(link);
     });
@@ -427,13 +430,8 @@ BVB.prototype.insertScores = function(scores) {
             '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
-    var overallSum = this.games.reduce(function(a, g) {
-        if (g.score)
-            return a + g.score;
-        return a;
-    }, 0);
-
-    var insertChart = function(elem, player, i) {
+    /* build the player specific chart */
+    var buildChart = function(elem, player, i) {
         /* create header and div */
         var div = $('<div id="chart' + i +'" class="chart"></div>');
         elem.append('<h2>Development</h2>');
@@ -495,7 +493,8 @@ BVB.prototype.insertScores = function(scores) {
         /* player's score div */
         var div = $('<div id="tab' + i + '" class="player"></div>');
 
-        /* table header */
+    /* table header */
+        div.append('<h2>Scores</h2>');
         var table = $('<table><tr><th>Date</th><th>Match</th><th>Result</th><th>Points</th></tr></table>');
 
         var sum = 0;
@@ -530,7 +529,7 @@ BVB.prototype.insertScores = function(scores) {
         div.append(table);
         scores.append(div);
 
-        insertChart(div, player, i);
+        buildChart(div, player, i);
     });
 }
 
@@ -547,6 +546,9 @@ $(function() {
 
     /* insert all scores into table */
     bvb.insertScores(scores);
+
+    /* active 'team' statistics at first */
+    bvb.activatePlayer(scores, $('#nav0'), '#tab0')();
 
     /* remove all script tags from html */
     $('script').remove();
