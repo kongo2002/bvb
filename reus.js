@@ -96,7 +96,8 @@ var Position = {
     T : 'Torwart',
     A : 'Abwehr',
     M : 'Mittelfeld',
-    S : 'Sturm'
+    S : 'Sturm',
+    Q : 'Team'
 }
 
 /**
@@ -161,6 +162,8 @@ var Mittelfeld = getPlayer(Position.M);
 var Sturm = getPlayer(Position.S);
 
 var Players = {
+    Team : new Player('Borussia Dortmund', 'Team', Position.Q),
+
     Alomerovic : Torwart('Alomerovic', 'Zlatan'),
     Langerak : Torwart('Langerak', 'Mitchell'),
     Weidenfeller : Torwart('Weidenfeller', 'Roman'),
@@ -220,15 +223,8 @@ function BVB() {
             ? (dortmund + ' : ' + opponent)
             : (opponent + ' : ' + dortmund);
 
-        var matchType = matchType || 'Bundesliga';
-        var mType = MatchType[matchType];
-
-        var overallScore = overallGoals = overallAssists = overallBoniScore = 0;
-        var overallBoni = [];
-
-        Players.forEach(function(player, i, name) {
-            /* create an empty match object */
-            var match = {
+        var buildMatch = function() {
+            return {
                 date : date,
                 game : game,
                 result : result,
@@ -238,7 +234,17 @@ function BVB() {
                 assists : 0,
                 boni : [],
                 boniSum : 0
-            };
+            }
+        }
+
+        var matchType = matchType || 'Bundesliga';
+        var mType = MatchType[matchType];
+
+        var overall = buildMatch();
+
+        Players.forEach(function(player, i, name) {
+            /* create an empty match object */
+            var match = buildMatch();
 
             if (scores[name]) {
                 var p = scores[name];
@@ -247,17 +253,19 @@ function BVB() {
                 match.goals = p.goals || 0;
                 var goalValue = mType.goal * match.goals;
 
-                overallGoals += match.goals;
                 match.score += goalValue;
-                overallScore += goalValue;
+
+                overall.goals += match.goals;
+                overall.score += goalValue;
 
                 /* process player's assists */
                 match.assists = p.assists || 0;
                 var assistValue = mType.assist * match.assists;
 
-                overallAssists += match.assists;
                 match.score += assistValue;
-                overallScore += assistValue;
+
+                overall.assists += match.assists;
+                overall.score += assistValue;
 
                 /* process boni */
                 if (p.boni) {
@@ -266,29 +274,21 @@ function BVB() {
                     p.boni.forEach(function(b) {
                         bonusScore += b.bonus(match.score);
                         match.boni.push(b);
-                        overallBoni.push(b);
+                        overall.boni.push(b);
                     });
 
                     match.boniSum = bonusScore;
-                    overallScore += bonusScore;
-                    overallBoniScore += bonusScore;
+                    overall.score += bonusScore;
+                    overall.boniSum += bonusScore;
                 }
             }
 
-            player.addMatch(match);
+            if (player.position != Position.Q)
+                player.addMatch(match);
         });
 
-        games.push({
-                date : date,
-                game : game,
-                result : result,
-                type : mType,
-                score : overallScore,
-                goals : overallGoals,
-                assists : overallAssists,
-                boni : overallBoni,
-                boniSum : overallBoniScore
-            });
+        Players.Team.addMatch(overall);
+        games.push(overall);
     }
 
     /* add all available matches */
