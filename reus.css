@@ -41,7 +41,7 @@ div#scores {
     float: left;
 }
 
-div#chart {
+div.chart {
     width: 500px;
     height: 300px;
 }

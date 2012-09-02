@@ -150,6 +150,28 @@ Player.prototype.addMatch = function(match) {
     }
 }
 
+Player.prototype._get = function(selector) {
+    var data = [];
+
+    this.matches.sort(Helpers.byDate).forEach(function(match) {
+        data.push([match.date, selector(match)]);
+    });
+
+    return data;
+}
+
+Player.prototype.getScores = function() {
+    return this._get(function(elem) { return elem.score; });
+}
+
+Player.prototype.getGoals = function() {
+    return this._get(function(elem) { return elem.goals; });
+}
+
+Player.prototype.getAssists = function() {
+    return this._get(function(elem) { return elem.assists; });
+}
+
 var getPlayer = function(position) {
     return function(name, firstName, transfer) {
         return new Player(name, firstName, position, transfer);
@@ -316,28 +338,6 @@ function BVB() {
         });
 }
 
-BVB.prototype._get = function(selector) {
-    var data = [];
-
-    this.games.sort(Helpers.byDate).forEach(function(match) {
-        data.push([match.date, selector(match)]);
-    });
-
-    return data;
-};
-
-BVB.prototype.getScores = function() {
-    return this._get(function(elem) { return elem.score; });
-};
-
-BVB.prototype.getGoals = function() {
-    return this._get(function(elem) { return elem.goals; });
-};
-
-BVB.prototype.getAssists = function() {
-    return this._get(function(elem) { return elem.assists; });
-};
-
 BVB.prototype.insertPlayers = function(scores) {
     var list = $('<ul class="navigation"></ul>');
 
@@ -433,6 +433,64 @@ BVB.prototype.insertScores = function(scores) {
         return a;
     }, 0);
 
+    var insertChart = function(elem, player, i) {
+        /* create header and div */
+        var div = $('<div id="chart' + i +'" class="chart"></div>');
+        elem.append('<h2>Development</h2>');
+        elem.append(div);
+
+        var chart = $.plot(div, [{
+            data : player.getScores(),
+            yaxis : 1,
+            color : '#f2bc00',
+            points : { show : true },
+            lines : { show : true },
+            label : 'Score (in €)',
+            shadowSize : 0
+        }, {
+            data : player.getGoals(),
+            yaxis : 2,
+            color : '#f8d763',
+            points : { show : true },
+            lines : { show : true },
+            shadowSize : 0,
+            label : 'Goals'
+        }, {
+            data : player.getAssists(),
+            yaxis : 2,
+            color : '#584400',
+            points : { show : true },
+            lines : { show : true },
+            shadowSize : 0,
+            label : 'Assists'
+        }],
+        {
+            grid : { hoverable : true },
+            legend : { backgroundOpacity : 0.25 },
+            xaxis : { mode : 'time' },
+            yaxis : { min : 0 },
+            yaxes : [{
+                tickFormatter : function(value, axis) {
+                    return Helpers.toCurrency(value);
+                }
+            }, {
+                position : 'right'
+            }]
+        });
+
+        /* highlight the data points of the match row that
+         * is currently being hovered over */
+        elem.find('tr.row').each(function(i) {
+            var elem = $(this);
+            elem.on('mouseenter', function() {
+                chart.highlight(0, i);
+                chart.highlight(1, i);
+                chart.highlight(2, i);
+            });
+            elem.on('mouseleave', function() { chart.unhighlight(); });
+        });
+    }
+
     Players.forEach(function(player, i) {
         /* player's score div */
         var div = $('<div id="tab' + i + '" class="player"></div>');
@@ -471,8 +529,10 @@ BVB.prototype.insertScores = function(scores) {
 
         div.append(table);
         scores.append(div);
+
+        insertChart(div, player, i);
     });
-};
+}
 
 /**
  * Document's OnLoad callback
@@ -487,58 +547,6 @@ $(function() {
 
     /* insert all scores into table */
     bvb.insertScores(scores);
-
-    /* draw chart */
-    var chart = $.plot($('#chart'), [{
-        data : bvb.getScores(),
-        yaxis : 1,
-        color : '#f2bc00',
-        points : { show : true },
-        lines : { show : true },
-        label : 'Score (in €)',
-        shadowSize : 0
-    }, {
-        data : bvb.getGoals(),
-        yaxis : 2,
-        color : '#f8d763',
-        points : { show : true },
-        lines : { show : true },
-        shadowSize : 0,
-        label : 'Goals'
-    }, {
-        data : bvb.getAssists(),
-        yaxis : 2,
-        color : '#584400',
-        points : { show : true },
-        lines : { show : true },
-        shadowSize : 0,
-        label : 'Assists'
-    }],
-    {
-        grid : { hoverable : true },
-        legend : { backgroundOpacity : 0.25 },
-        xaxis : { mode : 'time' },
-        yaxis : { min : 0 },
-        yaxes : [{
-            tickFormatter : function(value, axis) {
-                return Helpers.toCurrency(value);
-            }
-        }, {
-            position : 'right'
-        }]
-    });
-
-    /* highlight the data points of the match row that
-     * is currently being hovered over */
-    $('tr.row').each(function(i) {
-        var elem = $(this);
-        elem.on('mouseenter', function() {
-            chart.highlight(0, i);
-            chart.highlight(1, i);
-            chart.highlight(2, i);
-        });
-        elem.on('mouseleave', function() { chart.unhighlight(); });
-    });
 
     /* remove all script tags from html */
     $('script').remove();
