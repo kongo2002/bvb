@@ -95,3 +95,32 @@ div#chart {
     display: none;
 }
 
+.navigation {
+    clear: both;
+    display: table;
+    content: "";
+    max-width: 700px;
+}
+
+.tab {
+    float: left;
+    margin: 2px;
+    padding: 2px 0px;
+    white-space: nowrap;
+    list-style: none outside none;
+}
+
+.tab a {
+    color: #f2bc00;
+    background: #666;
+    padding: 2px 5px;
+    text-decoration: none;
+}
+
+.tab.activetab a {
+    background: #444;
+}
+
+.tab a:hover {
+    background: #444;
+}

@@ -104,13 +104,16 @@ var Position = {
  *
  * Class describing a player
  */
-function Player(name, firstName, position) {
+function Player(name, firstName, position, transfer) {
     this.name = name;
     this.firstName = firstName;
     this.position = position;
+    this.matches = [];
     this.goals = [];
     this.assists = [];
     this.boni = [];
+    this.transfer = transfer || 0;
+    this.score = 0;
 }
 
 Player.prototype.getGoalCount = function() {
@@ -121,21 +124,34 @@ Player.prototype.getAssistCount = function() {
     return this.assists.length;
 }
 
-Player.prototype.addGoal = function(date) {
-    this.goals.push(date);
+Player.prototype.getTransfer = function() {
+    return this.transfer;
 }
 
-Player.prototype.addAssist = function(date) {
-    this.assists.push(date);
+Player.prototype.getScore = function() {
+    return this.score;
 }
 
-Player.prototype.addBonus = function(date, bonus) {
-    this.boni.push({ date : date, bonus : bonus});
+Player.prototype.addMatch = function(match) {
+    this.matches.push(match);
+
+    if (match.goals)
+        this.goals.push({ date : match.date, goals : match.goals });
+
+    if (match.assists)
+        this.assists.push({ date : match.date, assists : match.assists });
+
+    if (match.boni) {
+        var boni = this.boni;
+        match.boni.forEach(function(b) {
+            boni.push({ date : match.date, bonus : b.boni });
+        });
+    }
 }
 
 var getPlayer = function(position) {
-    return function(name, firstName) {
-        return new Player(name, firstName, position);
+    return function(name, firstName, transfer) {
+        return new Player(name, firstName, position, transfer);
     }
 }
 
@@ -168,11 +184,22 @@ var Players = {
     Kehl : Mittelfeld('Kehl', 'Sebastian'),
     Leitner : Mittelfeld('Leitner', 'Moritz'),
     Perisic : Mittelfeld('Perisic', 'Ivan'),
-    Reus : Mittelfeld('Reus', 'Marco'),
+    Reus : Mittelfeld('Reus', 'Marco', 17100000),
 
     Ducksch : Sturm('Ducksch', 'Marvin'),
     Lewandowski : Sturm('Lewandowski', 'Robert'),
-    Schieber : Sturm('Schieber', 'Julian')
+    Schieber : Sturm('Schieber', 'Julian'),
+
+    forEach : function(func) {
+        var i = 0;
+        for (var name in this) {
+            var player = this[name];
+            if (typeof player !== 'function') {
+                func.call(player, player, i, name);
+                i += 1;
+            }
+        }
+    }
 }
 
 /**
@@ -180,16 +207,13 @@ var Players = {
  *
  * Class encapsulating all major functionality
  */
-function Reus() {
-
-    /* transfer sum */
-    this.transferSum = 17100000;
+function BVB() {
 
     /* list of games */
     var games = this.games = [];
 
     /* build a game object based on the given result and match type */
-    var addMatch = function(date, opponent, result, goals, assists, homegame, matchType, bonus) {
+    var addMatch = function(date, opponent, result, scores, homegame, matchType) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
         var game = homegame
@@ -198,55 +222,101 @@ function Reus() {
 
         var matchType = matchType || 'Bundesliga';
         var mType = MatchType[matchType];
-        var goalCount = goals ? goals.length : 0;
-        var assistCount = assists ? assists.length : 0;
-        var score = mType.goal * goalCount + mType.assist * assistCount;
 
-        /* process boni */
-        if (bonus) {
-            bonus.forEach(function(b) { score += b.bonus(score); });
-        }
+        var overallScore = overallGoals = overallAssists = overallBoniScore = 0;
+        var overallBoni = [];
 
-        /* process player's goals */
-        if (goals) {
-            goals.forEach(function(goal) { Players[goal].addGoal(date); });
-        }
+        Players.forEach(function(player, i, name) {
+            /* create an empty match object */
+            var match = {
+                date : date,
+                game : game,
+                result : result,
+                type : mType,
+                score : 0,
+                goals : 0,
+                assists : 0,
+                boni : [],
+                boniSum : 0
+            };
 
-        /* process player's assists */
-        if (assists) {
-            assists.forEach(function(assist) { Players[assist].addAssist(date); });
-        }
+            if (scores[name]) {
+                var p = scores[name];
+
+                /* process player's goals */
+                match.goals = p.goals || 0;
+                var goalValue = mType.goal * match.goals;
+
+                overallGoals += match.goals;
+                match.score += goalValue;
+                overallScore += goalValue;
+
+                /* process player's assists */
+                match.assists = p.assists || 0;
+                var assistValue = mType.assist * match.assists;
+
+                overallAssists += match.assists;
+                match.score += assistValue;
+                overallScore += assistValue;
+
+                /* process boni */
+                if (p.boni) {
+                    var bonusScore = 0;
+
+                    p.boni.forEach(function(b) {
+                        bonusScore += b.bonus(match.score);
+                        match.boni.push(b);
+                        overallBoni.push(b);
+                    });
+
+                    match.boniSum = bonusScore;
+                    overallScore += bonusScore;
+                    overallBoniScore += bonusScore;
+                }
+            }
+
+            player.addMatch(match);
+        });
 
         games.push({
-            date : date,
-            game : game,
-            result : result,
-            score : score,
-            type : mType,
-            goals : goalCount,
-            assists : assistCount,
-            bonus : bonus
-        });
+                date : date,
+                game : game,
+                result : result,
+                type : mType,
+                score : overallScore,
+                goals : overallGoals,
+                assists : overallAssists,
+                boni : overallBoni,
+                boniSum : overallBoniScore
+            });
     }
 
     /* add all available matches */
-    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3',
-            [ Players.Blaszczykowski, Players.Reus, Players.Perisic ],
-            [ Players.Lewandowski, Players.Piszczek, Players.Blaszczykowski ],
-            false, 'Pokal');
+    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', {
+            Blaszczykowski : { goals : 1, assists : 1 },
+            Reus : { goals : 1 },
+            Perisic : { goals : 1 },
+            Lewandowski : { assists : 1 },
+            Piszczek : { assists : 1 }
+        },
+        false, 'Pokal');
 
-    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1',
-            [ Players.Reus, Players.Götze ],
-            [ Players.Blaszczykowski, Players.Lewandowski ],
-            true, 'Bundesliga', [ Bonus.TOTD ]);
-    // totd: reus, kehl
+    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', {
+             Reus : { goals : 1, boni : [ Bonus.TOTD ] },
+             Kehl : { boni : [ Bonus.TOTD ] },
+             Götze : { goals : 1 },
+             Blaszczykowski : { assists : 1 },
+             Lewandowski : { assists : 1 }
+        },
+        true, 'Bundesliga');
 
-    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1',
-            [ Players.Blaszczykowski ],
-            [ Players.Perisic ]);
+    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', {
+             Blaszczykowski : { goals : 1 },
+             Perisic : { assists : 1 }
+        });
 }
 
-Reus.prototype._get = function(selector) {
+BVB.prototype._get = function(selector) {
     var data = [];
 
     this.games.sort(Helpers.byDate).forEach(function(match) {
@@ -256,19 +326,49 @@ Reus.prototype._get = function(selector) {
     return data;
 };
 
-Reus.prototype.getScores = function() {
+BVB.prototype.getScores = function() {
     return this._get(function(elem) { return elem.score; });
 };
 
-Reus.prototype.getGoals = function() {
+BVB.prototype.getGoals = function() {
     return this._get(function(elem) { return elem.goals; });
 };
 
-Reus.prototype.getAssists = function() {
+BVB.prototype.getAssists = function() {
     return this._get(function(elem) { return elem.assists; });
 };
 
-Reus.prototype.insertScores = function(table) {
+BVB.prototype.insertPlayers = function(scores) {
+    var list = $('<ul class="navigation"></ul>');
+
+    Players.forEach(function(player, i, name) {
+        var id = '#tab' + i;
+        var position = player.position.toString().toLowerCase();
+
+        var link = $('<li class="' + position + ' tab'
+            + '"><a href="'+id+'">' + name
+            + '</a></li>');
+
+        link.on('click', function() {
+            var all = scores.find('div.player');
+            all.addClass('hidden');
+
+            scores.find('ul.navigation li').removeClass('activetab');
+            link.addClass('activetab');
+
+            var active = scores.find(id);
+            active.removeClass('hidden');
+        });
+
+        list.append(link);
+    });
+
+    scores.append(list);
+}
+
+BVB.prototype.insertScores = function(scores) {
+    var games = this.games;
+
     /* build a score table row */
     var buildRow = function(match) {
         return $('<tr class="row"><td>' + match.date.toLocaleDateString() + '</td>' +
@@ -327,47 +427,70 @@ Reus.prototype.insertScores = function(table) {
             '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
-    var sum = 0;
-    this.games.sort(Helpers.byDate).forEach(function(game) {
-        var row = buildRow(game);
-        var detail = buildDetail(game);
+    var overallSum = this.games.reduce(function(a, g) {
+        if (g.score)
+            return a + g.score;
+        return a;
+    }, 0);
 
-        /* add mouse hover */
-        var toggle = function() { row.toggleClass('activerow'); }
-        row.on('mouseenter', toggle);
-        row.on('mouseleave', toggle);
+    Players.forEach(function(player, i) {
+        /* player's score div */
+        var div = $('<div id="tab' + i + '" class="player"></div>');
 
-        /* add detail handler */
-        row.on('click', function() { detail.toggleClass('hidden'); });
+        /* table header */
+        var table = $('<table><tr><th>Date</th><th>Match</th><th>Result</th><th>Points</th></tr></table>');
 
-        sum = sum + game.score;
+        var sum = 0;
+        player.matches.sort(Helpers.byDate).forEach(function(game) {
+            var row = buildRow(game);
+            var detail = buildDetail(game);
 
-        table.append(row);
-        table.append(detail);
+            /* add mouse hover */
+            var toggle = function() { row.toggleClass('activerow'); }
+            row.on('mouseenter', toggle);
+            row.on('mouseleave', toggle);
+
+            /* add detail handler */
+            row.on('click', function() { detail.toggleClass('hidden'); });
+
+            sum = sum + game.score;
+
+            table.append(row);
+            table.append(detail);
+        });
+
+        /* add acquired score row */
+        table.append(buildSummary('Acquired score:', sum));
+
+        /* add remaining score/money row (if specified) */
+        if (player.getTransfer()) {
+            table.append(buildSummary('Remaining:', player.getTransfer() - sum,
+                        'Remaining score til reaching the transfer amount of ' +
+                        Helpers.toCurrency(player.getTransfer())));
+        }
+
+        div.append(table);
+        scores.append(div);
     });
-
-    /* add acquired score row */
-    table.append(buildSummary('Acquired score:', sum));
-
-    /* add remaining score/money row */
-    table.append(buildSummary('Remaining:', this.transferSum - sum,
-                'Remaining score til reaching the transfer amount of ' +
-                Helpers.toCurrency(this.transferSum)));
 };
 
 /**
  * Document's OnLoad callback
  */
 $(function() {
-    /* initialize new Reus instance */
-    var reus = new Reus();
+    /* initialize new BVB instance */
+    var bvb = new BVB();
+    var scores = $('#scores');
+
+    /* insert player's names as tab-like navigation */
+    bvb.insertPlayers(scores);
 
     /* insert all scores into table */
-    reus.insertScores($('#scores table'));
+    bvb.insertScores(scores);
 
     /* draw chart */
     var chart = $.plot($('#chart'), [{
-        data : reus.getScores(),
+        data : bvb.getScores(),
         yaxis : 1,
         color : '#f2bc00',
         points : { show : true },
@@ -375,7 +498,7 @@ $(function() {
         label : 'Score (in €)',
         shadowSize : 0
     }, {
-        data : reus.getGoals(),
+        data : bvb.getGoals(),
         yaxis : 2,
         color : '#f8d763',
         points : { show : true },
@@ -383,7 +506,7 @@ $(function() {
         shadowSize : 0,
         label : 'Goals'
     }, {
-        data : reus.getAssists(),
+        data : bvb.getAssists(),
         yaxis : 2,
         color : '#584400',
         points : { show : true },
