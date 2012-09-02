@@ -192,7 +192,7 @@ var Players = {
 
     Santana : Abwehr('Santana', 'Felipe'),
     Hummels : Abwehr('Hummels', 'Mats'),
-    Kirch : Abwehr('Kirch', 'Oliver'),
+    Kirch : Abwehr('Kirch', 'Oliver', 350000),
     Löwe : Abwehr('Löwe', 'Chris'),
     Owomoyela : Abwehr('Owomoyela', 'Patrick'),
     Piszczek : Abwehr('Piszczek', 'Lukasz'),
@@ -213,7 +213,7 @@ var Players = {
 
     Ducksch : Sturm('Ducksch', 'Marvin'),
     Lewandowski : Sturm('Lewandowski', 'Robert'),
-    Schieber : Sturm('Schieber', 'Julian'),
+    Schieber : Sturm('Schieber', 'Julian', 5500000),
 
     forEach : function(func) {
         var i = 0;
@@ -300,6 +300,7 @@ function BVB() {
                     });
 
                     match.boniSum = bonusScore;
+                    match.score += bonusScore;
                     overall.score += bonusScore;
                     overall.boniSum += bonusScore;
                 }
@@ -407,15 +408,15 @@ BVB.prototype.insertScores = function(scores) {
         }
 
         /* add bonus scores */
-        if (match.bonus) {
-            match.bonus.forEach(function(b) {
+        if (match.boni) {
+            match.boni.forEach(function(b) {
                 detail += '<div class="detailRow">' + b.name + ' = ' +
                     Helpers.toCurrency(b.bonus(score)) + '</div>';
             });
         }
 
         /* player didn't score at all */
-        if (!match.goals && !match.assists && !match.bonus) {
+        if (!match.goals && !match.assists && !match.boniSum) {
             detail += '<div class="detailRow">No scores at all</div>';
         }
 
