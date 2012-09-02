@@ -104,7 +104,7 @@ function Reus() {
     var games = this.games = [];
 
     /* build a game object based on the given result and match type */
-    var addGame = function(date, opponent, result, goals, assists, homegame, matchType, bonus) {
+    var addMatch = function(date, opponent, result, goals, assists, homegame, matchType, bonus) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
         var game = homegame
@@ -130,10 +130,10 @@ function Reus() {
         });
     }
 
-    /* add all available games */
-    addGame(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
-    addGame(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true, 'Bundesliga', [ Bonus.TOTD ]);
-    addGame(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', 0, 0);
+    /* add all available matches */
+    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
+    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true, 'Bundesliga', [ Bonus.TOTD ]);
+    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', 0, 0);
 }
 
 Reus.prototype._get = function(selector) {
@@ -173,6 +173,7 @@ Reus.prototype.insertScores = function(table) {
         var detail = '<tr class="hidden"><td class="detail" colspan="4">' +
             '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
 
+        /* add goals score */
         if (match.goals) {
             var value = match.goals * match.type.goal;
             score += value;
@@ -182,6 +183,7 @@ Reus.prototype.insertScores = function(table) {
                 Helpers.toCurrency(value) + '</div>';
         }
 
+        /* add assists score */
         if (match.assists) {
             var value = match.assists * match.type.assist;
             score += value;
@@ -191,11 +193,17 @@ Reus.prototype.insertScores = function(table) {
                 Helpers.toCurrency(value) + '</div>';
         }
 
+        /* add bonus scores */
         if (match.bonus) {
             match.bonus.forEach(function(b) {
                 detail += '<div class="detailRow">' + b.name + ' = ' +
                     Helpers.toCurrency(b.bonus(score)) + '</div>';
             });
+        }
+
+        /* player didn't score at all */
+        if (!match.goals && !match.assists && !match.bonus) {
+            detail += '<div class="detailRow">No scores at all</div>';
         }
 
         detail += '</td></tr>';
