@@ -110,8 +110,27 @@ function Player(name, firstName, position) {
     this.position = position;
     this.goals = [];
     this.assists = [];
-    this.goalCount = function() { return this.goals.length; }
-    this.assistCount = function() { return this.goals.length; }
+    this.boni = [];
+}
+
+Player.prototype.getGoalCount = function() {
+    return this.goals.length;
+}
+
+Player.prototype.getAssistCount = function() {
+    return this.assists.length;
+}
+
+Player.prototype.addGoal = function(date) {
+    this.goals.push(date);
+}
+
+Player.prototype.addAssist = function(date) {
+    this.assists.push(date);
+}
+
+Player.prototype.addBonus = function(date, bonus) {
+    this.boni.push({ date : date, bonus : bonus});
 }
 
 var getPlayer = function(position) {
@@ -179,10 +198,24 @@ function Reus() {
 
         var matchType = matchType || 'Bundesliga';
         var mType = MatchType[matchType];
-        var score = mType.goal * goals + mType.assist * assists;
+        var goalCount = goals ? goals.length : 0;
+        var assistCount = assists ? assists.length : 0;
+        var score = mType.goal * goalCount + mType.assist * assistCount;
 
-        if (bonus)
+        /* process boni */
+        if (bonus) {
             bonus.forEach(function(b) { score += b.bonus(score); });
+        }
+
+        /* process player's goals */
+        if (goals) {
+            goals.forEach(function(goal) { Players[goal].addGoal(); });
+        }
+
+        /* process player's assists */
+        if (assists) {
+            assists.forEach(function(assist) { Players[assist].addAssist(); });
+        }
 
         games.push({
             'date' : date,
@@ -190,16 +223,27 @@ function Reus() {
             'result' : result,
             'score' : score,
             'type' : mType,
-            'goals' : goals,
-            'assists' : assists,
+            'goals' : goalCount,
+            'assists' : assistCount,
             'bonus' : bonus
         });
     }
 
     /* add all available matches */
-    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', 1, 0, false, 'Pokal');
-    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', 1, 0, true, 'Bundesliga', [ Bonus.TOTD ]);
-    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', 0, 0);
+    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3',
+            [ Players.Blaszczykowski, Players.Reus, Players.Perisic ],
+            [ Players.Lewandowski, Players.Piszczek, Players.Blaszczykowski ],
+            false, 'Pokal');
+
+    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1',
+            [ Players.Reus, Players.Götze ],
+            [ Players.Blaszczykowski, Players.Lewandowski ],
+            true, 'Bundesliga', [ Bonus.TOTD ]);
+    // totd: reus, kehl
+
+    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1',
+            [ Players.Blaszczykowski ],
+            [ Players.Perisic ]);
 }
 
 Reus.prototype._get = function(selector) {
