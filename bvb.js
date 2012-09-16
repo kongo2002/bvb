@@ -105,7 +105,7 @@ var Position = {
  *
  * Class describing a player
  */
-function Player(name, firstName, position, transfer) {
+function Player(name, firstName, position, transfer, extraFuncs) {
     this.name = name;
     this.firstName = firstName;
     this.position = position;
@@ -115,6 +115,7 @@ function Player(name, firstName, position, transfer) {
     this.boni = [];
     this.transfer = transfer || 0;
     this.score = 0;
+    this.extraFuncs = extraFuncs;
 }
 
 Player.prototype.getGoalCount = function() {
@@ -173,8 +174,8 @@ Player.prototype.getAssists = function() {
 }
 
 var getPlayer = function(position) {
-    return function(name, firstName, transfer) {
-        return new Player(name, firstName, position, transfer);
+    return function(name, firstName, transfer, extraFuncs) {
+        return new Player(name, firstName, position, transfer, extraFuncs);
     }
 }
 
