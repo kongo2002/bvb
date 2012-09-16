@@ -100,11 +100,45 @@ var Helpers = {
 }
 
 var Position = {
-    T : 'Torwart',
-    A : 'Abwehr',
-    M : 'Mittelfeld',
-    S : 'Sturm',
-    Q : 'Team'
+    T : {
+        name : 'Torwart',
+        goal : 1000000,
+        assist : 500000,
+        holdPenalty : 300000
+    },
+    IV : {
+        name : 'Innen-Verteidigung',
+        goal : 250000,
+        assist : 250000
+    },
+    AV : {
+        name : 'Aussen-Verteidigung',
+        goal : 300000,
+        assist : 100000
+    },
+    M : {
+        name : 'Mittelfeld',
+        goal : 100000,
+        assist : 50000
+    },
+    DM : {
+        name : 'Defensives Mittelfeld',
+        goal : 200000,
+        assist : 100000
+    },
+    A : {
+        name : 'Aussen',
+        goal : 150000,
+        assist : 75000
+    },
+    S : {
+        name : 'Sturm',
+        goal : 75000,
+        assist : 125000
+    },
+    Q : {
+        name : 'Team'
+    }
 }
 
 /**
@@ -187,8 +221,11 @@ var getPlayer = function(position) {
 }
 
 var Torwart = getPlayer(Position.T);
-var Abwehr = getPlayer(Position.A);
+var InnenVerteidigung = getPlayer(Position.IV);
+var AussenVerteidigung = getPlayer(Position.AV);
 var Mittelfeld = getPlayer(Position.M);
+var DefensivesMittelfeld = getPlayer(Position.DM);
+var Aussen = getPlayer(Position.A);
 var Sturm = getPlayer(Position.S);
 
 /**
@@ -203,23 +240,26 @@ function Players() {
     this.Langerak = Torwart('Langerak', 'Mitchell');
     this.Weidenfeller = Torwart('Weidenfeller', 'Roman');
 
-    this.Santana = Abwehr('Santana', 'Felipe');
-    this.Hummels = Abwehr('Hummels', 'Mats');
-    this.Kirch = Abwehr('Kirch', 'Oliver', 350000);
-    this.Löwe = Abwehr('Löwe', 'Chris');
-    this.Owomoyela = Abwehr('Owomoyela', 'Patrick');
-    this.Piszczek = Abwehr('Piszczek', 'Lukasz');
-    this.Schmelzer = Abwehr('Schmelzer', 'Marcel');
-    this.Subotic = Abwehr('Subotic', 'Neven');
+    this.Santana = InnenVerteidigung('Santana', 'Felipe');
+    this.Hummels = InnenVerteidigung('Hummels', 'Mats');
+    this.Subotic = InnenVerteidigung('Subotic', 'Neven');
+
+    this.Kirch = AussenVerteidigung('Kirch', 'Oliver', 350000);
+    this.Löwe = AussenVerteidigung('Löwe', 'Chris');
+    this.Owomoyela = AussenVerteidigung('Owomoyela', 'Patrick');
+    this.Piszczek = AussenVerteidigung('Piszczek', 'Lukasz');
+    this.Schmelzer = AussenVerteidigung('Schmelzer', 'Marcel');
+
+    this.Gündogan = DefensivesMittelfeld('Gündogan', 'Ilkay');
+    this.Kehl = DefensivesMittelfeld('Kehl', 'Sebastian');
+    this.Bender = DefensivesMittelfeld('Bender', 'Sven');
+
+    this.Grosskreutz = Aussen('Grosskreutz', 'Kevin');
+    this.Blaszczykowski = Aussen('Blaszczykowski', 'Jakub');
 
     this.Amini = Mittelfeld('Amini', 'Mustafa');
-    this.Bender = Mittelfeld('Bender', 'Sven');
     this.Bittencourt = Mittelfeld('Bittencourt', 'Leonardo');
-    this.Blaszczykowski = Mittelfeld('Blaszczykowski', 'Jakub');
     this.Götze = Mittelfeld('Götze', 'Mario');
-    this.Grosskreutz = Mittelfeld('Grosskreutz', 'Kevin');
-    this.Gündogan = Mittelfeld('Gündogan', 'Ilkay');
-    this.Kehl = Mittelfeld('Kehl', 'Sebastian');
     this.Leitner = Mittelfeld('Leitner', 'Moritz');
     this.Perisic = Mittelfeld('Perisic', 'Ivan');
     this.Reus = Mittelfeld('Reus', 'Marco', 17100000);
@@ -382,8 +422,8 @@ BVB.prototype.insertPlayers = function(scores) {
     var list = $('<ul class="navigation"></ul>');
 
     this.players.forEach(function(player, i, name) {
-        var id = '#tab' + i;
-        var position = player.position.toString().toLowerCase();
+            var id = '#tab' + i;
+        var position = player.position.name.toLowerCase().replace(/[- ]/, '');
 
         var link = $('<li class="' + position + ' tab'
             + '" id="nav'+i+'"><a href="'+id+'">' + name
