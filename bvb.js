@@ -341,12 +341,21 @@ function BVB() {
              Blaszczykowski : { assists : 1 },
              Lewandowski : { assists : 1 }
         },
-        true, 'Bundesliga');
+        true);
 
     addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', {
              Blaszczykowski : { goals : 1 },
              Perisic : { assists : 1 }
         });
+
+    addMatch(Helpers.day(2012, 9, 15), 'Bayer Leverkusen', '3:0', {
+            Hummels : { goals : 1 },
+            Schmelzer : { assists : 1 },
+            Blaszczykowski : { goals : 1 },
+            Reus : { assists : 1 },
+            Lewandowski : { goals : 1 },
+            Piszczek : { assists : 1 }
+        }, true);
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
