@@ -563,7 +563,8 @@ BVB.prototype.insertScores = function(scores) {
 
     /* table header */
         div.append('<h2>Scores</h2>');
-        var table = $('<table><tr><th>Date</th><th>Match</th><th>Championship</th><th>Result</th><th>Points</th></tr></table>');
+        var table = $('<table><tr><th>Date</th><th>Match</th>' +
+            '<th>Championship</th><th>Result</th><th>Points</th></tr></table>');
 
         var sum = 0;
         player.matches.sort(Helpers.byDate).forEach(function(game) {
