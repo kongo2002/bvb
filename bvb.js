@@ -299,6 +299,8 @@ function BVB() {
     var addMatch = function(date, opponent, result, scores, homegame, matchType) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
+        var matchType = matchType || 'Bundesliga';
+        var mType = MatchType[matchType];
         var game = homegame
             ? (dortmund + ' : ' + opponent)
             : (opponent + ' : ' + dortmund);
@@ -316,9 +318,6 @@ function BVB() {
                 boniSum : 0
             }
         }
-
-        var matchType = matchType || 'Bundesliga';
-        var mType = MatchType[matchType];
 
         var overall = buildMatch();
 
@@ -444,6 +443,7 @@ BVB.prototype.insertScores = function(scores) {
     var buildRow = function(match) {
         return $('<tr class="row"><td>' + match.date.toLocaleDateString() + '</td>' +
                  '<td>' + match.game + '</td>' +
+                 '<td>' + match.type.name + '</td>' +
                  '<td>' + match.result + '</td>' +
                  '<td class="currency">' + Helpers.toCurrency(match.score) + '</td></tr>');
     }
@@ -451,7 +451,7 @@ BVB.prototype.insertScores = function(scores) {
     /* build a match's detail view */
     var buildDetail = function(match) {
         var score = 0;
-        var detail = '<tr class="hidden"><td class="detail" colspan="4">' +
+        var detail = '<tr class="hidden"><td class="detail" colspan="5">' +
             '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
 
         /* add goals score */
@@ -494,7 +494,7 @@ BVB.prototype.insertScores = function(scores) {
     /* build a summary table row */
     var buildSummary = function(description, sum, title) {
         var tip = title || '';
-        return '<tr class="summary" title="' + tip + '"><td colspan="3">' + description + '</td>' +
+        return '<tr class="summary" title="' + tip + '"><td colspan="4">' + description + '</td>' +
             '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
@@ -563,7 +563,7 @@ BVB.prototype.insertScores = function(scores) {
 
     /* table header */
         div.append('<h2>Scores</h2>');
-        var table = $('<table><tr><th>Date</th><th>Match</th><th>Result</th><th>Points</th></tr></table>');
+        var table = $('<table><tr><th>Date</th><th>Match</th><th>Championship</th><th>Result</th><th>Points</th></tr></table>');
 
         var sum = 0;
         player.matches.sort(Helpers.byDate).forEach(function(game) {
