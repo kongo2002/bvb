@@ -5,36 +5,43 @@
 var MatchType = {
     Bundesliga : {
         name : 'Bundesliga',
+        factor : 1,
         goal : 100000,
         assist : 50000
     },
     Pokal : {
         name : 'Pokal',
+        factor : 1.5,
         goal : 150000,
         assist : 50000
     },
     CLGroupPhase : {
         name : 'Champions League - Group phase',
+        factor : 2.5,
         goal : 250000,
         assist : 100000
     },
     CL16 : {
         name : 'Champions League - Round of 16',
+        factor : 3.5,
         goal : 350000,
         assist : 200000
     },
     CL8 : {
         name : 'Champions League - Quarter finals',
+        factor : 4.5,
         goal : 500000,
         assist : 250000
     },
     CL4 : {
         name : 'Champions League - Semi finals',
+        factor : 5.5,
         goal : 750000,
         assist : 400000
     },
     CLFinal : {
         name : 'Champions League - Final',
+        factor : 6.5,
         goal : 800000,
         assist : 500000
     }
