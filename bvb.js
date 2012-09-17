@@ -396,11 +396,11 @@ function BVB() {
         });
 
     addMatch(Helpers.day(2012, 9, 15), 'Bayer Leverkusen', '3:0', {
-            Hummels : { goals : 1 },
-            Schmelzer : { assists : 1 },
+            Hummels : { goals : 1, boni : [ Bonus.TOTD ] },
+            Schmelzer : { assists : 1, boni : [ Bonus.TOTD ] },
             Blaszczykowski : { goals : 1 },
             Reus : { assists : 1 },
-            Lewandowski : { goals : 1 },
+            Lewandowski : { goals : 1, boni : [ Bonus.TOTD ] },
             Piszczek : { assists : 1 }
         }, true);
 }
