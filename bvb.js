@@ -403,6 +403,11 @@ function BVB() {
             Lewandowski : { goals : 1, boni : [ Bonus.TOTD ] },
             Piszczek : { assists : 1 }
         }, true);
+
+    addMatch(Helpers.day(2012, 9, 18), 'Ajax Amsterdam', '1:0', {
+            Lewandowski : { goals : 1 },
+            Piszczek : { assists : 1 }
+        }, true, 'CLGroupPhase');
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
