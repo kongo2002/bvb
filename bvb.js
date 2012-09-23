@@ -296,7 +296,7 @@ function BVB() {
     this.games = [];
 
     /* build a game object based on the given result and match type */
-    var addMatch = function(date, opponent, result, scores, homegame, matchType) {
+    var addMatch = function(date, opponent, ownGoals, opponentGoals, scores, homegame, matchType) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
         var matchType = matchType || 'Bundesliga';
@@ -304,6 +304,9 @@ function BVB() {
         var game = homegame
             ? (dortmund + ' : ' + opponent)
             : (opponent + ' : ' + dortmund);
+        var result = homegame
+            ? ownGoals + ':' + opponentGoals
+            : opponentGoals + ':' + ownGoals;
 
         var buildMatch = function() {
             return {
@@ -372,7 +375,7 @@ function BVB() {
     }
 
     /* add all available matches */
-    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', '0:3', {
+    addMatch(Helpers.day(2012, 8, 18), 'FC Oberneuland', 3, 0, {
             Blaszczykowski : { goals : 1, assists : 1 },
             Reus : { goals : 1 },
             Perisic : { goals : 1 },
@@ -381,7 +384,7 @@ function BVB() {
         },
         false, 'Pokal');
 
-    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', '2:1', {
+    addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', 2, 1, {
              Reus : { goals : 1, boni : [ Bonus.TOTD ] },
              Kehl : { boni : [ Bonus.TOTD ] },
              Götze : { goals : 1 },
@@ -390,12 +393,12 @@ function BVB() {
         },
         true);
 
-    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', '1:1', {
+    addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', 1, 1, {
              Blaszczykowski : { goals : 1 },
              Perisic : { assists : 1 }
         });
 
-    addMatch(Helpers.day(2012, 9, 15), 'Bayer Leverkusen', '3:0', {
+    addMatch(Helpers.day(2012, 9, 15), 'Bayer Leverkusen', 3, 0, {
             Hummels : { goals : 1, boni : [ Bonus.TOTD ] },
             Schmelzer : { assists : 1, boni : [ Bonus.TOTD ] },
             Blaszczykowski : { goals : 1 },
@@ -404,12 +407,12 @@ function BVB() {
             Piszczek : { assists : 1 }
         }, true);
 
-    addMatch(Helpers.day(2012, 9, 18), 'Ajax Amsterdam', '1:0', {
+    addMatch(Helpers.day(2012, 9, 18), 'Ajax Amsterdam', 1, 0, {
             Lewandowski : { goals : 1 },
             Piszczek : { assists : 1 }
         }, true, 'CLGroupPhase');
 
-    addMatch(Helpers.day(2012, 9, 22), 'Hamburger SV', '3:2', {
+    addMatch(Helpers.day(2012, 9, 22), 'Hamburger SV', 2, 3, {
             Perisic : { goals : 2 },
             Lewandowski : { assists : 1 },
             Piszczek : { assists : 1 }
