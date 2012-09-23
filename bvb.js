@@ -370,6 +370,10 @@ function BVB() {
                 player.addMatch(match);
         });
 
+        if (overall.goals != ownGoals)
+            throw 'Number of goals (' + ownGoals + ') does not match with the specified players\' scores ('
+                    + overall.goals + ')';
+
         self.players.Team.addMatch(overall);
         self.games.push(overall);
     }
