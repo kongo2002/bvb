@@ -408,6 +408,12 @@ function BVB() {
             Lewandowski : { goals : 1 },
             Piszczek : { assists : 1 }
         }, true, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 9, 22), 'Hamburger SV', '3:2', {
+            Perisic : { goals : 2 },
+            Lewandowski : { assists : 1 },
+            Piszczek : { assists : 1 }
+        });
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
