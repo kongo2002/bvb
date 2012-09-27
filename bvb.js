@@ -421,6 +421,13 @@ function BVB() {
             Lewandowski : { assists : 1 },
             Piszczek : { assists : 1 }
         });
+
+    addMatch(Helpers.day(2012, 9, 25), 'Eintracht Frankfurt', 3, 3, {
+            Götze : { goals : 1, boni : [ Bonus.TOTD ] },
+            Piszczek : { goals : 1, assists : 1 },
+            Reus : { goals : 1 },
+            Hummels : { assists : 1 }
+        });
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
