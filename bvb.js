@@ -5,45 +5,31 @@
 var MatchType = {
     Bundesliga : {
         name : 'Bundesliga',
-        factor : 1,
-        goal : 100000,
-        assist : 50000
+        factor : 1
     },
     Pokal : {
         name : 'Pokal',
-        factor : 1.5,
-        goal : 150000,
-        assist : 50000
+        factor : 1.5
     },
     CLGroupPhase : {
         name : 'Champions League - Group phase',
-        factor : 2.5,
-        goal : 250000,
-        assist : 100000
+        factor : 2.5
     },
     CL16 : {
         name : 'Champions League - Round of 16',
-        factor : 3.5,
-        goal : 350000,
-        assist : 200000
+        factor : 3.5
     },
     CL8 : {
         name : 'Champions League - Quarter finals',
-        factor : 4.5,
-        goal : 500000,
-        assist : 250000
+        factor : 4.5
     },
     CL4 : {
         name : 'Champions League - Semi finals',
-        factor : 5.5,
-        goal : 750000,
-        assist : 400000
+        factor : 5.5
     },
     CLFinal : {
         name : 'Champions League - Final',
-        factor : 6.5,
-        goal : 800000,
-        assist : 500000
+        factor : 6.5
     }
 }
 
@@ -53,21 +39,99 @@ var MatchType = {
 var Bonus = {
     Schalke : {
         name : 'Schalke 04',
-        bonus : function(value) { return value; }
+        description : 'Match against Schalke 04',
+        func : function(match) { return match.score; }
     },
     Bayern : {
         name : 'Bayern München',
-        bonus : function(value) { return value; }
+        description : 'Match against Bayern München',
+        func : function(match) { return match.score; }
     },
     POTD : {
         name : 'Kicker Player of the day',
-        bonus : function(value) { return 200000; }
+        description : 'Got elected as "Kicker Player of the day"',
+        func : function(match) { return 200000; }
     },
     TOTD : {
         name : 'Kicker Team of the day',
-        bonus : function(value) { return 25000; }
+        description : 'Got chosen for the "Kicker Team of the day"',
+        func : function(match) { return 25000; }
+    },
+    ParriedPenalty : {
+        name : 'Parried penalty kick',
+        description : 'Parried a penalty kick',
+        func : function(match) { return 300000; }
+    },
+    ShotPenalty : {
+        name : 'Scored a penalty kick goal',
+        description : 'Scored a penalty kick goal',
+        func : function(match) { return 300000; }
+    },
+    MatchWinningGoal : {
+        name : 'Scored match winning goal',
+        description : 'Scored the match winning goal',
+        func : function(match) { return match.score; }
     }
 }
+
+/**
+ * Various triggered bonus scores
+ */
+var Triggers = [
+    {
+        name : 'Win!',
+        description : 'Win bonus',
+        pred : function(match) {
+            return match.match.isWin();
+        },
+        func : function(match) {
+            return 10000;
+        }
+    },
+    {
+        name : 'Hattrick',
+        description : 'Scored 3 or more goals in one match',
+        pred : function(match) {
+            return match.goals >= 3;
+        },
+        func : function(match) {
+            return 500000;
+        }
+    },
+    {
+        name : 'Yellow card',
+        description : 'Got a yellow card',
+        isMalus : true,
+        pred : function(match) {
+            return match.yellow == 1;
+        },
+        func : function(match) {
+            return -25000;
+        }
+    },
+    {
+        name : 'Yellow/red card',
+        description : 'Got a yellow followed by a red card',
+        isMalus : true,
+        pred : function(match) {
+            return match.yellow > 1;
+        },
+        func : function(match) {
+            return -100000;
+        }
+    },
+    {
+        name : 'Red card',
+        description : 'Got banned from the match by a red card',
+        isMalus : true,
+        pred : function(match) {
+            return match.red > 0;
+        },
+        func : function(match) {
+            return -300000;
+        }
+    }
+]
 
 /**
  * Various helper functions
@@ -104,12 +168,34 @@ var Position = {
         name : 'Torwart',
         goal : 1000000,
         assist : 500000,
-        holdPenalty : 300000
+        holdPenalty : 300000,
+        specials : [
+        {
+            name : '"Weisse Weste"',
+            description : 'Bonus for a match with a clean sheet',
+            pred : function(match) {
+                return match.played && match.match.opponentGoals < 1;
+            },
+            func : function(match) {
+                return 100000;
+            }
+        }]
     },
     IV : {
         name : 'Innen-Verteidigung',
         goal : 250000,
-        assist : 250000
+        assist : 250000,
+        specials : [
+        {
+            name : '"Weisse Weste"',
+            description : 'Bonus for a match with a clean sheet',
+            pred : function(match) {
+                return match.played && match.match.opponentGoals < 1;
+            },
+            func : function(match) {
+                return 25000;
+            }
+        }]
     },
     AV : {
         name : 'Aussen-Verteidigung',
@@ -283,6 +369,23 @@ Players.prototype.forEach = function(func) {
 /**
  * @constructor
  *
+ * Class holding one match's information
+ */
+function Match(date, goals, opponentGoals, home, type) {
+    this.date = date;
+    this.goals = goals;
+    this.opponentGoals = opponentGoals;
+    this.home = home;
+    this.matchType = type;
+}
+
+Match.prototype.isWin = function() {
+    return this.goals > this.opponentGoals;
+}
+
+/**
+ * @constructor
+ *
  * Class encapsulating all major functionality
  */
 function BVB() {
@@ -296,7 +399,7 @@ function BVB() {
     this.games = [];
 
     /* build a game object based on the given result and match type */
-    var addMatch = function(date, opponent, ownGoals, opponentGoals, scores, homegame, matchType) {
+    var addMatch = function(date, opponent, goals, opponentGoals, scores, homegame, matchType) {
 
         var dortmund = '<em>Borussia Dortmund</em>';
         var matchType = matchType || 'Bundesliga';
@@ -305,8 +408,10 @@ function BVB() {
             ? (dortmund + ' : ' + opponent)
             : (opponent + ' : ' + dortmund);
         var result = homegame
-            ? ownGoals + ':' + opponentGoals
-            : opponentGoals + ':' + ownGoals;
+            ? goals + ':' + opponentGoals
+            : opponentGoals + ':' + goals;
+
+        var match = new Match(date, goals, opponentGoals, home, mType);
 
         var buildMatch = function() {
             return {
@@ -314,11 +419,17 @@ function BVB() {
                 game : game,
                 result : result,
                 type : mType,
+                match : match,
                 score : 0,
                 goals : 0,
                 assists : 0,
                 boni : [],
-                boniSum : 0
+                boniSum : 0,
+                goalSum : 0,
+                assistSum : 0,
+                yellow : 0,
+                red : 0,
+                played : false
             }
         }
 
@@ -328,50 +439,97 @@ function BVB() {
             /* create an empty match object */
             var match = buildMatch();
 
+            /* return if it's the team's virtual player */
+            if (player.position == Position.Q)
+                return;
+
             if (scores[name]) {
                 var p = scores[name];
 
+                /* player is in the scores collection
+                 * so he obviously took part in the match */
+                match.played = true;
+
                 /* process player's goals */
                 match.goals = p.goals || 0;
-                var goalValue = mType.goal * match.goals;
+                var goalValue = player.position.goal * mType.factor * match.goals;
 
+                match.goalSum += goalValue;
                 match.score += goalValue;
 
                 overall.goals += match.goals;
+                overall.goalSum += goalValue;
                 overall.score += goalValue;
 
                 /* process player's assists */
                 match.assists = p.assists || 0;
-                var assistValue = mType.assist * match.assists;
+                var assistValue = player.position.assist * mType.factor * match.assists;
 
+                match.assistSum += assistValue;
                 match.score += assistValue;
 
                 overall.assists += match.assists;
+                overall.assistSum += assistValue;
                 overall.score += assistValue;
 
                 /* process boni */
                 if (p.boni) {
-                    var bonusScore = 0;
-
                     p.boni.forEach(function(b) {
-                        bonusScore += b.bonus(match.score);
+                        match.boniSum += b.func.call(player, match);
+
                         match.boni.push(b);
                         overall.boni.push(b);
                     });
-
-                    match.boniSum = bonusScore;
-                    match.score += bonusScore;
-                    overall.score += bonusScore;
-                    overall.boniSum += bonusScore;
                 }
+
+                /* process cards */
+                var yellow = p.yellow || 0;
+                var red = p.red || 0;
+
+                match.yellow += yellow;
+                match.red += red;
+
+                overall.yellow += yellow;
+                overall.red += red;
             }
 
-            if (player.position != Position.Q)
-                player.addMatch(match);
+            /* process the player's custom boni */
+            if (player.extraFuncs) {
+                player.extraFuncs.forEach(function(b) {
+                    var applies = !b.pred || b.pred.call(player, match);
+                    if (applies) {
+                        match.boniSum += b.func.call(player, match);
+
+                        match.boni.push(b);
+                        overall.boni.push(b);
+                    }
+                });
+            }
+
+            /* process the player's position boni */
+            if (player.position.specials) {
+                player.position.specials.forEach(function(s) {
+                    var applies = !s.pred || s.pred.call(player, match);
+                    if (applies) {
+                        match.boniSum += s.func.call(player, match);
+
+                        match.boni.push(s);
+                        overall.boni.push(s);
+                    }
+                });
+            }
+
+            /* add sum of boni at last in order to calculate all
+             * other bonus scores based on the pure score value */
+            match.score += match.boniSum;
+            overall.boniSum += match.boniSum;
+            overall.score += match.boniSum;
+
+            player.addMatch(match);
         });
 
-        if (overall.goals != ownGoals)
-            throw 'Number of goals (' + ownGoals + ') does not match with the specified players\' scores ('
+        if (overall.goals != goals)
+            throw 'Number of goals (' + goals + ') does not match with the specified players\' scores ('
                     + overall.goals + ')';
 
         self.players.Team.addMatch(overall);
@@ -412,7 +570,7 @@ function BVB() {
         }, true);
 
     addMatch(Helpers.day(2012, 9, 18), 'Ajax Amsterdam', 1, 0, {
-            Lewandowski : { goals : 1 },
+            Lewandowski : { goals : 1, boni : [ Bonus.MatchWinningGoal ] },
             Piszczek : { assists : 1 }
         }, true, 'CLGroupPhase');
 
@@ -474,36 +632,35 @@ BVB.prototype.insertScores = function(scores) {
     }
 
     /* build a match's detail view */
-    var buildDetail = function(match) {
-        var score = 0;
+    var buildDetail = function(player, match) {
         var detail = '<tr class="hidden"><td class="detail" colspan="5">' +
             '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
 
         /* add goals score */
         if (match.goals) {
-            var value = match.goals * match.type.goal;
-            score += value;
+            detail += '<div class="detailRow">Goals: ' + match.goals;
 
-            detail += '<div class="detailRow">Goals: ' + match.goals + ' * ' +
-                Helpers.toCurrency(match.type.goal) + ' = ' +
-                Helpers.toCurrency(value) + '</div>';
+            if (player.position.goal)
+                detail += ' * ' + Helpers.toCurrency(player.position.goal * match.type.factor);
+
+            detail += ' = ' + Helpers.toCurrency(match.goalSum) + '</div>';
         }
 
         /* add assists score */
         if (match.assists) {
-            var value = match.assists * match.type.assist;
-            score += value;
+            detail += '<div class="detailRow">Assists: ' + match.assists;
 
-            detail += '<div class="detailRow">Assists: ' + match.assists + ' * ' +
-                Helpers.toCurrency(match.type.assist) + ' = ' +
-                Helpers.toCurrency(value) + '</div>';
+            if (player.position.assist)
+                detail += ' * ' + Helpers.toCurrency(player.position.assist * match.type.factor);
+
+            detail += ' = ' + Helpers.toCurrency(match.assistSum) +'</div>';
         }
 
         /* add bonus scores */
         if (match.boni) {
             match.boni.forEach(function(b) {
                 detail += '<div class="detailRow">' + b.name + ' = ' +
-                    Helpers.toCurrency(b.bonus(score)) + '</div>';
+                    Helpers.toCurrency(b.func.call(player, match)) + '</div>';
             });
         }
 
@@ -594,7 +751,7 @@ BVB.prototype.insertScores = function(scores) {
         var sum = 0;
         player.matches.sort(Helpers.byDate).forEach(function(game) {
             var row = buildRow(game);
-            var detail = buildDetail(game);
+            var detail = buildDetail(player, game);
 
             /* add mouse hover */
             var toggle = function() { row.toggleClass('activerow'); }
