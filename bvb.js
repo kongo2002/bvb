@@ -386,6 +386,19 @@ Match.prototype.isWin = function() {
 /**
  * @constructor
  *
+ * Class holding a reference information for an
+ * aquired bonus score.
+ */
+function BonusInfo(date, bonus, value) {
+    this.date = date;
+    this.name = bonus.name;
+    this.description = bonus.description || '';
+    this.value = value;
+}
+
+/**
+ * @constructor
+ *
  * Class encapsulating all major functionality
  */
 function BVB() {
@@ -475,10 +488,13 @@ function BVB() {
                 /* process boni */
                 if (p.boni) {
                     p.boni.forEach(function(b) {
-                        match.boniSum += b.func.call(player, match);
+                        var value = b.func.call(player, match);
+                        match.boniSum += value;
 
-                        match.boni.push(b);
-                        overall.boni.push(b);
+                        var bonusInfo = new BonusInfo(match.date, b, value);
+
+                        match.boni.push(bonusInfo);
+                        overall.boni.push(bonusInfo);
                     });
                 }
 
@@ -498,10 +514,13 @@ function BVB() {
                 player.extraFuncs.forEach(function(b) {
                     var applies = !b.pred || b.pred.call(player, match);
                     if (applies) {
-                        match.boniSum += b.func.call(player, match);
+                        var value = b.func.call(player, match);
+                        match.boniSum += value;
 
-                        match.boni.push(b);
-                        overall.boni.push(b);
+                        var bonusInfo = new BonusInfo(match.date, b, value);
+
+                        match.boni.push(bonusInfo);
+                        overall.boni.push(bonusInfo);
                     }
                 });
             }
@@ -511,13 +530,30 @@ function BVB() {
                 player.position.specials.forEach(function(s) {
                     var applies = !s.pred || s.pred.call(player, match);
                     if (applies) {
-                        match.boniSum += s.func.call(player, match);
+                        var value = s.func.call(player, match);
+                        match.boniSum += value;
 
-                        match.boni.push(s);
-                        overall.boni.push(s);
+                        var bonusInfo = new BonusInfo(match.date, s, value);
+
+                        match.boni.push(bonusInfo);
+                        overall.boni.push(bonusInfo);
                     }
                 });
             }
+
+            /* process triggered boni */
+            Triggers.forEach(function(t) {
+                var applies = !t.pred || t.pred.call(player, match);
+                if (applies) {
+                    var value = t.func.call(player, match);
+                    match.boniSum += value;
+
+                    var bonusInfo = new BonusInfo(match.date, t, value);
+
+                    match.boni.push(bonusInfo);
+                    overall.boni.push(bonusInfo);
+                }
+            });
 
             /* add sum of boni at last in order to calculate all
              * other bonus scores based on the pure score value */
@@ -585,6 +621,14 @@ function BVB() {
             Piszczek : { goals : 1, assists : 1 },
             Reus : { goals : 1 },
             Hummels : { assists : 1 }
+        });
+
+    addMatch(Helpers.day(2012, 9, 29), 'Borussia Mönchengladbach', 5, 0, {
+            Reus : { goals : 2 },
+            Subotic : { goals : 1 },
+            Blaszczykowski : { goals : 1, assists : 2 },
+            Götze : { assists : 1 },
+            Gündogan : { goals : 1, assists : 1 }
         });
 }
 
@@ -660,7 +704,7 @@ BVB.prototype.insertScores = function(scores) {
         if (match.boni) {
             match.boni.forEach(function(b) {
                 detail += '<div class="detailRow">' + b.name + ' = ' +
-                    Helpers.toCurrency(b.func.call(player, match)) + '</div>';
+                    Helpers.toCurrency(b.value) + '</div>';
             });
         }
 
