@@ -441,6 +441,7 @@ function BonusInfo(date, bonus, value) {
     this.name = bonus.name;
     this.description = bonus.description || '';
     this.value = value;
+    this.easteregg = bonus.easteregg;
 }
 
 /**
@@ -796,7 +797,8 @@ BVB.prototype.insertScores = function(scores) {
         /* add bonus scores */
         if (match.boni) {
             match.boni.forEach(function(b) {
-                detail += '<div class="detailRow">' + b.name + ' = ' +
+                detail += '<div class="detailRow' +
+                    (b.easteregg ? ' easteregg' : '') + '">' + b.name + ' = ' +
                     Helpers.toCurrency(b.value) + '</div>';
             });
         }
