@@ -263,6 +263,12 @@ Player.prototype.getScore = function() {
     return this.score;
 }
 
+Player.prototype.getName = function() {
+    if (this.position == Position.Q)
+        return this.name;
+    return this.firstName + ' ' + this.name;
+}
+
 Player.prototype.addMatch = function(match) {
     this.matches.push(match);
 
@@ -763,6 +769,32 @@ BVB.prototype.insertScores = function(scores) {
         return $(detail);
     }
 
+    /* build the player's information */
+    var buildInfo = function(elem, player, i) {
+        var div = $('<div id="info' + i + '"></div>');
+        var table = $('<table class="information"></table>');
+
+        /* add information rows */
+        var addRow = function(name, value) {
+            table.append('<tr><td class="infoname">' + name + ':</td><td class="infovalue">' + value + '</td></tr>');
+        };
+
+        addRow('Position', player.position.name);
+        addRow('Games played', player.played + (player.substituted
+                    ? (' (' + player.substituted + ' substitutions)')
+                    : ''));
+
+        var goals = player.getGoalCount();
+        var assists = player.getAssistCount();
+
+        if (goals) addRow('Goals', goals);
+        if (assists) addRow('Assists', assists);
+
+        div.append(table);
+        elem.append('<h2>' + player.getName() + '</h2>');
+        elem.append(div);
+    }
+
     /* build a summary table row */
     var buildSummary = function(description, sum, title) {
         var tip = title || '';
@@ -774,7 +806,7 @@ BVB.prototype.insertScores = function(scores) {
     var buildChart = function(elem, player, i) {
         /* create header and div */
         var div = $('<div id="chart' + i +'" class="chart"></div>');
-        elem.append('<h2>Development</h2>');
+        elem.append('<h3>Development</h3>');
         elem.append(div);
 
         var chart = $.plot(div, [{
@@ -833,8 +865,12 @@ BVB.prototype.insertScores = function(scores) {
         /* player's score div */
         var div = $('<div id="tab' + i + '" class="player"></div>');
 
-    /* table header */
-        div.append('<h2>Scores</h2>');
+        /* add player's information */
+        if (player.position != Position.Q)
+            buildInfo(div, player, i);
+
+        /* table header */
+        div.append('<h3>Scores</h3>');
         var table = $('<table><tr><th>Date</th><th>Match</th>' +
             '<th>Championship</th><th>Result</th><th>Points</th></tr></table>');
 
