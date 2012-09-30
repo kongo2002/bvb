@@ -156,7 +156,7 @@ var Helpers = {
 
         if (strNumber.length > 3)
             strNumber = strNumber.split('').reverse().reduce(function(acc, num, i) {
-                return num + (i && !(i%3) && i>3 ? ',' : '') + acc;
+                return num + (i && !(i%3) && i>3 && num != '-' ? ',' : '') + acc;
             });
 
         /* strip decimals if zero */
@@ -346,13 +346,29 @@ function Players() {
     this.Langerak = Torwart('Langerak', 'Mitchell');
     this.Weidenfeller = Torwart('Weidenfeller', 'Roman');
 
-    this.Santana = InnenVerteidigung('Santana', 'Felipe');
+    this.Santana = InnenVerteidigung('Santana', 'Felipe', 0, [{
+        name : 'Tele Commander',
+        description : 'Score multiplier of 2 and a goal score of one million',
+        easteregg : true,
+        func : function(match) { return match.goals * 1000000 + match.score * 2; }
+        }]);
     this.Hummels = InnenVerteidigung('Hummels', 'Mats');
     this.Subotic = InnenVerteidigung('Subotic', 'Neven');
 
-    this.Kirch = AussenVerteidigung('Kirch', 'Oliver', 350000);
+    this.Kirch = AussenVerteidigung('Kirch', 'Oliver', 350000, [{
+        name : 'Kirch malus',
+        description : 'Kirch has a base malus per startup of -100.000',
+        easteregg : true,
+        pred : function(match) { return match.played && !match.substituted; },
+        func : function(match) { return -100000; }
+        }]);
     this.Löwe = AussenVerteidigung('Löwe', 'Chris');
-    this.Owomoyela = AussenVerteidigung('Owomoyela', 'Patrick');
+    this.Owomoyela = AussenVerteidigung('Owomoyela', 'Patrick', 0, [{
+        name : 'Uwe Special',
+        description : 'Uwe gets a score multiplier of 4',
+        easteregg : true,
+        func : function(match) { return match.score * 4; }
+        }]);
     this.Piszczek = AussenVerteidigung('Piszczek', 'Lukasz');
     this.Schmelzer = AussenVerteidigung('Schmelzer', 'Marcel');
 
@@ -363,11 +379,22 @@ function Players() {
     this.Grosskreutz = Aussen('Grosskreutz', 'Kevin');
     this.Blaszczykowski = Aussen('Blaszczykowski', 'Jakub');
 
-    this.Amini = Mittelfeld('Amini', 'Mustafa');
+    this.Amini = Mittelfeld('Amini', 'Mustafa', 0, [{
+        name : 'Pumuckl bonus',
+        description : 'Mustafa Amini get a score multiplier of 10',
+        easteregg : true,
+        func : function(match) { return match.score * 10; }
+        }]);
     this.Bittencourt = Mittelfeld('Bittencourt', 'Leonardo');
     this.Götze = Mittelfeld('Götze', 'Mario');
     this.Leitner = Mittelfeld('Leitner', 'Moritz');
-    this.Perisic = Mittelfeld('Perisic', 'Ivan');
+    this.Perisic = Mittelfeld('Perisic', 'Ivan', 0, [ {
+        name : 'Perisic Special',
+        description : 'Startup bonus for Ivan Perisic',
+        easteregg : true,
+        pred : function(match) { return match.played && !match.substituted; },
+        func : function(match) { return 100000; }
+        }]);
     this.Reus = Mittelfeld('Reus', 'Marco', 17100000);
 
     this.Ducksch = Sturm('Ducksch', 'Marvin');
@@ -530,12 +557,14 @@ function BVB() {
                 if (p.boni) {
                     p.boni.forEach(function(b) {
                         var value = b.func.call(player, match);
-                        match.boniSum += value;
+                        if (value != 0) {
+                            match.boniSum += value;
 
-                        var bonusInfo = new BonusInfo(match.date, b, value);
+                            var bonusInfo = new BonusInfo(match.date, b, value);
 
-                        match.boni.push(bonusInfo);
-                        overall.boni.push(bonusInfo);
+                            match.boni.push(bonusInfo);
+                            overall.boni.push(bonusInfo);
+                        }
                     });
                 }
 
@@ -562,12 +591,14 @@ function BVB() {
                     var applies = !b.pred || b.pred.call(player, match);
                     if (applies) {
                         var value = b.func.call(player, match);
-                        match.boniSum += value;
+                        if (value != 0) {
+                            match.boniSum += value;
 
-                        var bonusInfo = new BonusInfo(match.date, b, value);
+                            var bonusInfo = new BonusInfo(match.date, b, value);
 
-                        match.boni.push(bonusInfo);
-                        overall.boni.push(bonusInfo);
+                            match.boni.push(bonusInfo);
+                            overall.boni.push(bonusInfo);
+                        }
                     }
                 });
             }
@@ -578,12 +609,14 @@ function BVB() {
                     var applies = !s.pred || s.pred.call(player, match);
                     if (applies) {
                         var value = s.func.call(player, match);
-                        match.boniSum += value;
+                        if (value != 0) {
+                            match.boniSum += value;
 
-                        var bonusInfo = new BonusInfo(match.date, s, value);
+                            var bonusInfo = new BonusInfo(match.date, s, value);
 
-                        match.boni.push(bonusInfo);
-                        overall.boni.push(bonusInfo);
+                            match.boni.push(bonusInfo);
+                            overall.boni.push(bonusInfo);
+                        }
                     }
                 });
             }
@@ -593,12 +626,14 @@ function BVB() {
                 var applies = !t.pred || t.pred.call(player, match);
                 if (applies) {
                     var value = t.func.call(player, match);
-                    match.boniSum += value;
+                    if (value != 0) {
+                        match.boniSum += value;
 
-                    var bonusInfo = new BonusInfo(match.date, t, value);
+                        var bonusInfo = new BonusInfo(match.date, t, value);
 
-                    match.boni.push(bonusInfo);
-                    overall.boni.push(bonusInfo);
+                        match.boni.push(bonusInfo);
+                        overall.boni.push(bonusInfo);
+                    }
                 }
             });
 
