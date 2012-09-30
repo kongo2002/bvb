@@ -243,6 +243,8 @@ function Player(name, firstName, position, transfer, extraFuncs) {
     this.transfer = transfer || 0;
     this.score = 0;
     this.extraFuncs = extraFuncs;
+    this.played = 0;
+    this.substituted = 0;
 }
 
 Player.prototype.getGoalCount = function() {
@@ -263,6 +265,12 @@ Player.prototype.getScore = function() {
 
 Player.prototype.addMatch = function(match) {
     this.matches.push(match);
+
+    if (match.played)
+        this.played += 1;
+
+    if (match.substituted)
+        this.substituted += 1;
 
     if (match.goals)
         this.goals.push({ date : match.date, goals : match.goals });
