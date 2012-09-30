@@ -159,6 +159,10 @@ var Helpers = {
                 return num + (i && !(i%3) && i>3 ? ',' : '') + acc;
             });
 
+        /* strip decimals if zero */
+        if (strNumber.match(/\.00$/))
+            strNumber = strNumber.substring(0, strNumber.length-3);
+
         return strNumber + ' €';
     }
 }
