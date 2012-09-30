@@ -152,11 +152,11 @@ var Helpers = {
 
     /* number to currency conversion */
     toCurrency : function(number) {
-        var strNumber = number.toString();
+        var strNumber = number.toFixed(2);
 
         if (strNumber.length > 3)
             strNumber = strNumber.split('').reverse().reduce(function(acc, num, i) {
-                return num + (i && !(i%3) ? ',' : '') + acc;
+                return num + (i && !(i%3) && i>3 ? ',' : '') + acc;
             });
 
         return strNumber + ' €';
@@ -271,6 +271,8 @@ Player.prototype.getName = function() {
 
 Player.prototype.addMatch = function(match) {
     this.matches.push(match);
+
+    this.score += match.score;
 
     if (match.played)
         this.played += 1;
@@ -789,6 +791,12 @@ BVB.prototype.insertScores = function(scores) {
 
         if (goals) addRow('Goals', goals);
         if (assists) addRow('Assists', assists);
+
+        var score = player.getScore();
+        addRow('Score', Helpers.toCurrency(score));
+
+        if (score && player.played)
+            addRow('Score per game', Helpers.toCurrency(score / player.played));
 
         div.append(table);
         elem.append('<h2>' + player.getName() + '</h2>');
