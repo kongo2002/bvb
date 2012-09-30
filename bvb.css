@@ -16,9 +16,19 @@ table {
     border: solid #666 1px;
 }
 
+table.information {
+    border: none;
+    padding-left: 1em;
+}
+
 td {
     padding-left: 4px;
     padding-right: 4px;
+}
+
+td.infoname {
+    font-weight: bold;
+    padding-right: 1.5em;
 }
 
 th {

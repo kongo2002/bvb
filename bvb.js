@@ -165,7 +165,7 @@ var Helpers = {
 
 var Position = {
     T : {
-        name : 'Torwart',
+        name : 'Goalkeeper',
         goal : 1000000,
         assist : 500000,
         holdPenalty : 300000,
@@ -182,7 +182,7 @@ var Position = {
         }]
     },
     IV : {
-        name : 'Innen-Verteidigung',
+        name : 'Central defender',
         goal : 250000,
         assist : 250000,
         specials : [
@@ -198,27 +198,27 @@ var Position = {
         }]
     },
     AV : {
-        name : 'Aussen-Verteidigung',
+        name : 'Wing back',
         goal : 300000,
         assist : 100000
     },
     M : {
-        name : 'Mittelfeld',
+        name : 'Midfield',
         goal : 100000,
         assist : 50000
     },
     DM : {
-        name : 'Defensives Mittelfeld',
+        name : 'Defensive midfield',
         goal : 200000,
         assist : 100000
     },
     A : {
-        name : 'Aussen',
+        name : 'Wing player',
         goal : 150000,
         assist : 75000
     },
     S : {
-        name : 'Sturm',
+        name : 'Striker',
         goal : 75000,
         assist : 125000
     },
