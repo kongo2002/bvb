@@ -139,7 +139,7 @@ var Triggers = [
 var Helpers = {
     /* return a Date object based on the given date elements */
     day : function(year, month, day) {
-        var date = new Date(year, month, day, 0, 0, 0, 0);
+        var date = new Date(year, month-1, day, 0, 0, 0, 0);
         return date;
     },
 
@@ -716,14 +716,20 @@ function BVB() {
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Leitner', 'Kehl', 'Blaszczykowski', 'Perisic', 'Reus', 'Lewandowski'], [ 'Götze', 'Grosskreutz', 'Gündogan' ]);
 
     addMatch(Helpers.day(2012, 9, 29), 'Borussia Mönchengladbach', 5, 0, {
-            Reus : { goals : 2 },
-            Subotic : { goals : 1 },
-            Blaszczykowski : { goals : 1, assists : 2 },
+            Reus : { goals : 2, boni : [ Bonus.TOTD, Bonus.POTD ] },
+            Subotic : { goals : 1, boni : [ Bonus.TOTD ] },
+            Blaszczykowski : { goals : 1, assists : 2, boni : [ Bonus.TOTD ] },
             Götze : { assists : 1 },
-            Gündogan : { goals : 1, assists : 1 }
+            Gündogan : { goals : 1, assists : 1, boni : [ Bonus.TOTD ] }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Gündogan', 'Kehl', 'Blaszczykowski', 'Götze', 'Reus', 'Schieber'], [ 'Grosskreutz', 'Bender', 'Santana' ],
         true);
+
+    addMatch(Helpers.day(2012, 10, 3), 'Manchester City', 1, 1, {
+            Reus : { goals : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Gündogan', 'Bender', 'Blaszczykowski', 'Götze', 'Reus', 'Lewandowski'], [ 'Grosskreutz', 'Kehl', 'Santana' ],
+        false, 'CLGroupPhase')
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
