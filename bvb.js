@@ -729,7 +729,13 @@ function BVB() {
             Reus : { goals : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Gündogan', 'Bender', 'Blaszczykowski', 'Götze', 'Reus', 'Lewandowski'], [ 'Grosskreutz', 'Kehl', 'Santana' ],
-        false, 'CLGroupPhase')
+        false, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 10, 8), 'Hannover 96', 1, 1, {
+            Lewandowski : { goals : 1 },
+            Piszczek : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Kehl', 'Bender', 'Blaszczykowski', 'Götze', 'Reus', 'Lewandowski'], [ 'Grosskreutz', 'Leitner', 'Santana' ]);
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
