@@ -733,7 +733,8 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 10, 8), 'Hannover 96', 1, 1, {
             Lewandowski : { goals : 1 },
-            Piszczek : { assists : 1 }
+            Piszczek : { assists : 1, boni : [ Bonus.TOTD ] },
+            Weidenfeller : { boni : [ Bonus.TOTD ] }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Kehl', 'Bender', 'Blaszczykowski', 'Götze', 'Reus', 'Lewandowski'], [ 'Grosskreutz', 'Leitner', 'Santana' ]);
 }
