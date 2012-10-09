@@ -472,7 +472,7 @@ function BVB() {
             ? goals + ':' + opponentGoals
             : opponentGoals + ':' + goals;
 
-        var match = new Match(date, goals, opponentGoals, home, mType);
+        var match = new Match(date, goals, opponentGoals, homegame, mType);
 
         var buildMatch = function() {
             return {
