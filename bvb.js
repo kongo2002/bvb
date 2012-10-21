@@ -737,6 +737,12 @@ function BVB() {
             Weidenfeller : { boni : [ Bonus.TOTD ] }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Kehl', 'Bender', 'Blaszczykowski', 'Götze', 'Reus', 'Lewandowski'], [ 'Grosskreutz', 'Leitner', 'Santana' ]);
+
+    addMatch(Helpers.day(2012, 10, 20), 'Schalke 04', 1, 2, {
+            Lewandowski : { goals : 1, boni : [ Bonus.Schalke] },
+            Reus : { assists : 1, boni : [ Bonus.Schalke] }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Perisic', 'Leitner', 'Reus', 'Lewandowski'], [ 'Bittencourt', 'Schieber', 'Santana' ], true);
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
