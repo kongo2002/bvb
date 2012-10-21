@@ -4,6 +4,11 @@ body {
     font-family: 'Palatino', 'Palatino Linotype', 'Georgia', serif;
 }
 
+#meta {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
 h1 {
     color: #222;
 }
@@ -108,8 +113,7 @@ div.chart {
 .navigation {
     clear: both;
     display: table;
-    content: "";
-    max-width: 700px;
+    padding: 0;
 }
 
 .tab {
