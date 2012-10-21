@@ -790,14 +790,13 @@ BVB.prototype.insertScores = function(scores) {
     var buildRow = function(match) {
         return $('<tr class="row"><td>' + match.date.toLocaleDateString() + '</td>' +
                  '<td>' + match.game + '</td>' +
-                 '<td>' + match.type.name + '</td>' +
                  '<td>' + match.result + '</td>' +
                  '<td class="currency">' + Helpers.toCurrency(match.score) + '</td></tr>');
     }
 
     /* build a match's detail view */
     var buildDetail = function(player, match) {
-        var detail = '<tr class="hidden"><td class="detail" colspan="5">' +
+        var detail = '<tr class="hidden"><td class="detail" colspan="4">' +
             '<div class="detailRow"><span>' + match.type.name + ':</span></div>';
 
         /* add goals score */
@@ -873,7 +872,7 @@ BVB.prototype.insertScores = function(scores) {
     /* build a summary table row */
     var buildSummary = function(description, sum, title) {
         var tip = title || '';
-        return '<tr class="summary" title="' + tip + '"><td colspan="4">' + description + '</td>' +
+        return '<tr class="summary" title="' + tip + '"><td colspan="3">' + description + '</td>' +
             '<td class="currency">' + Helpers.toCurrency(sum) + '</td></tr>';
     }
 
@@ -946,8 +945,8 @@ BVB.prototype.insertScores = function(scores) {
 
         /* table header */
         div.append('<h3>Scores</h3>');
-        var table = $('<table><tr><th>Date</th><th>Match</th>' +
-            '<th>Championship</th><th>Result</th><th>Points</th></tr></table>');
+        var table = $('<table><thead><tr><td>Date</td><td>Match</td>' +
+            '<td>Result</td><td>Points</td></tr></thead></table>');
 
         var sum = 0;
         player.matches.sort(Helpers.byDate).forEach(function(game) {

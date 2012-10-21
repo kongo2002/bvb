@@ -18,7 +18,16 @@ h2, h3, h4, h5, h6 {
 }
 
 table {
-    border: solid #666 1px;
+    border: none;
+}
+
+table thead {
+    font-weight: bold;
+}
+
+table thead td {
+    border-bottom: 1px solid #777;
+    padding-bottom: 6px;
 }
 
 table.information {
@@ -27,24 +36,12 @@ table.information {
 }
 
 td {
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 2px 1em;
 }
 
 td.infoname {
     font-weight: bold;
     padding-right: 1.5em;
-}
-
-th {
-    background: #555;
-    color: #f2bc00;
-    padding: 5px;
-}
-
-th.subheader {
-    background: #777;
-    color: #f2bc00;
 }
 
 div#legend {
@@ -66,14 +63,12 @@ div.chart {
 }
 
 .summary {
-    background: #777;
     font-weight: bold;
-    color: #f2bc00;
 }
 
 .summary td {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 6px;
+    border-top: 1px solid #777;
 }
 
 .currency {
