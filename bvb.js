@@ -668,23 +668,26 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 8, 24), 'Werder Bremen', 2, 1, {
              Reus : { goals : 1, boni : [ Bonus.TOTD ] },
-             Kehl : { boni : [ Bonus.TOTD ] },
+             Kehl : { boni : [ Bonus.TOTD ], yellow : 1 },
              Götze : { goals : 1 },
              Blaszczykowski : { assists : 1 },
-             Lewandowski : { assists : 1 }
+             Lewandowski : { assists : 1 },
+             Gündogan : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Kirch', 'Subotic', 'Hummels', 'Schmelzer', 'Gündogan', 'Kehl', 'Blaszczykowski', 'Grosskreutz', 'Reus', 'Lewandowski'], [ 'Leitner', 'Götze', 'Perisic' ],
         true);
 
     addMatch(Helpers.day(2012, 9, 1), '1. FC Nürnberg', 1, 1, {
              Blaszczykowski : { goals : 1 },
-             Perisic : { assists : 1 }
+             Perisic : { assists : 1 },
+             Piszczek : { yellow : 1 },
+             Grosskreutz : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Gündogan', 'Kehl', 'Blaszczykowski', 'Perisic', 'Reus', 'Lewandowski'], [ 'Götze', 'Schieber', 'Grosskreutz' ]);
 
     addMatch(Helpers.day(2012, 9, 15), 'Bayer Leverkusen', 3, 0, {
             Hummels : { goals : 1, boni : [ Bonus.TOTD ] },
-            Schmelzer : { assists : 1, boni : [ Bonus.TOTD ] },
+            Schmelzer : { assists : 1, boni : [ Bonus.TOTD ], yellow : 1 },
             Blaszczykowski : { goals : 1 },
             Reus : { assists : 1 },
             Lewandowski : { goals : 1, boni : [ Bonus.TOTD ] },
@@ -703,7 +706,8 @@ function BVB() {
     addMatch(Helpers.day(2012, 9, 22), 'Hamburger SV', 2, 3, {
             Perisic : { goals : 2 },
             Lewandowski : { assists : 1 },
-            Piszczek : { assists : 1 }
+            Piszczek : { assists : 1 },
+            Schmelzer : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Leitner', 'Kehl', 'Perisic', 'Götze', 'Reus', 'Lewandowski'], [ 'Schieber', 'Blaszczykowski' ]);
 
@@ -711,7 +715,8 @@ function BVB() {
             Götze : { goals : 1, boni : [ Bonus.TOTD ] },
             Piszczek : { goals : 1, assists : 1 },
             Reus : { goals : 1 },
-            Hummels : { assists : 1 }
+            Hummels : { assists : 1 },
+            Lewandowski : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Schmelzer', 'Leitner', 'Kehl', 'Blaszczykowski', 'Perisic', 'Reus', 'Lewandowski'], [ 'Götze', 'Grosskreutz', 'Gündogan' ]);
 
@@ -740,7 +745,9 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 10, 20), 'Schalke 04', 1, 2, {
             Lewandowski : { goals : 1, boni : [ Bonus.Schalke] },
-            Reus : { assists : 1, boni : [ Bonus.Schalke] }
+            Reus : { assists : 1, boni : [ Bonus.Schalke] },
+            Schieber : { yellow : 1 },
+            Leitner : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Perisic', 'Leitner', 'Reus', 'Lewandowski'], [ 'Bittencourt', 'Schieber', 'Santana' ], true);
 }
