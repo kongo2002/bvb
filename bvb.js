@@ -815,7 +815,7 @@ BVB.prototype.insertPlayers = function(scores) {
     var list = $('<ul class="navigation"></ul>');
 
     this.players.forEach(function(player, i, name) {
-            var id = '#tab' + i;
+        var id = '#' + name.toLowerCase();
         var position = player.position.name.toLowerCase().replace(/[- ]/, '');
 
         var link = $('<li class="' + position + ' tab'
@@ -1015,9 +1015,9 @@ BVB.prototype.insertScores = function(scores) {
         });
     }
 
-    this.players.forEach(function(player, i) {
+    this.players.forEach(function(player, i, name) {
         /* player's score div */
-        var div = $('<div id="tab' + i + '" class="player"></div>');
+        var div = $('<div id="' + name.toLowerCase() + '" class="player"></div>');
 
         /* add player's information */
         if (player.position != Position.Q)
@@ -1079,7 +1079,7 @@ $(function() {
     bvb.insertScores(scores);
 
     /* active 'team' statistics at first */
-    var teamTab = '#tab0';
+    var teamTab = '#team';
     bvb.activatePlayer(scores, $('#nav0'), teamTab)();
 
     bvb.buildHighscore($(teamTab));
