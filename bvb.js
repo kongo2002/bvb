@@ -150,6 +150,11 @@ var Helpers = {
         return 1;
     },
 
+    /* sorting function */
+    byScore : function(one, two) {
+        return two.score - one.score;
+    },
+
     /* number to currency conversion */
     toCurrency : function(number) {
         var strNumber = number.toFixed(2);
@@ -164,6 +169,15 @@ var Helpers = {
             strNumber = strNumber.substring(0, strNumber.length-3);
 
         return strNumber + ' €';
+    },
+
+    /* take the first N elements of the given Array */
+    take : function(array, n) {
+        var list = [];
+        var length = array ? array.length : 0;
+        for (var i=0; i<n && i<length; i++)
+            list.push(array[i]);
+        return list;
     }
 }
 
@@ -411,6 +425,19 @@ Players.prototype.forEach = function(func) {
             i += 1;
         }
     }
+}
+
+Players.prototype.sort = function(sorter, skipTeam) {
+    var list = [];
+    for (var name in this) {
+        var player = this[name];
+        if (typeof player !== 'function') {
+            if (!skipTeam || player.position != Position.Q) {
+                list.push(player);
+            }
+        }
+    }
+    return list.sort(sorter);
 }
 
 /**
@@ -750,6 +777,14 @@ function BVB() {
             Leitner : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Perisic', 'Leitner', 'Reus', 'Lewandowski'], [ 'Bittencourt', 'Schieber', 'Santana' ], true);
+
+    addMatch(Helpers.day(2012, 10, 24), 'Real Madrid', 2, 1, {
+            Lewandowski : { goals : 1 },
+            Schmelzer : { goals : 1, boni : [ Bonus.MatchWinningGoal ] },
+            Kehl : { assists : 1 },
+            Gündogan : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Gündogan', 'Schieber', 'Perisic' ], true, 'CLGroupPhase');
 }
 
 BVB.prototype.activatePlayer = function(scores, link, id) {
@@ -781,6 +816,24 @@ BVB.prototype.insertPlayers = function(scores) {
     });
 
     scores.append(list);
+}
+
+BVB.prototype.buildHighscore = function(element) {
+
+    var highscorePlayers = [];
+    var content = '';
+    var table = $('<table class="highscore"><thead><tr><td>Player</td><td>Score</td></tr></thead></table>');
+
+    Helpers.take(this.players.sort(Helpers.byScore, true), 5).forEach(function(p) {
+        content += '<tr><td>' + p.getName() + '</td><td>' + Helpers.toCurrency(p.score) + '</td></tr>';
+    });
+
+    /* append header */
+    element.append('<h3>Highscore</h3>');
+
+    /* append table */
+    element.append('<table class="highscore"><thead><tr><td>Player</td><td>Score</td></tr></thead>' +
+                '<tbody>' + content + '</tbody></table>');
 }
 
 BVB.prototype.insertScores = function(scores) {
@@ -999,7 +1052,10 @@ $(function() {
     bvb.insertScores(scores);
 
     /* active 'team' statistics at first */
-    bvb.activatePlayer(scores, $('#nav0'), '#tab0')();
+    var teamTab = '#tab0';
+    bvb.activatePlayer(scores, $('#nav0'), teamTab)();
+
+    bvb.buildHighscore($(teamTab));
 
     /* remove all script tags from html */
     $('script').remove();
