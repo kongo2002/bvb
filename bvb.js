@@ -143,16 +143,21 @@ var Helpers = {
         return date;
     },
 
-    /* sorting function */
+    /* sorting function: by date */
     byDate : function(one, two) {
         if (one.date < two.date)
             return -1;
         return 1;
     },
 
-    /* sorting function */
+    /* sorting function: by total score */
     byScore : function(one, two) {
         return two.score - one.score;
+    },
+
+    /* sorting function: by score per match */
+    byScorePerMatch : function(one, two){
+        return two.getScorePerMatch() - one.getScorePerMatch();
     },
 
     /* number to currency conversion */
@@ -279,6 +284,13 @@ Player.prototype.getTransfer = function() {
 
 Player.prototype.getScore = function() {
     return this.score;
+}
+
+Player.prototype.getScorePerMatch = function() {
+    if (this.played && this.score && this.played > this.substituted) {
+        return this.score / (this.played - this.substituted);
+    }
+    return 0;
 }
 
 Player.prototype.getName = function() {
@@ -819,21 +831,36 @@ BVB.prototype.insertPlayers = function(scores) {
 }
 
 BVB.prototype.buildHighscore = function(element) {
+    var div = $('<div class="highscores"></div>');
 
-    var highscorePlayers = [];
+    var getTable = function(name, str) {
+        return '<table class="highscore"><thead><tr><td></td><td>Player</td><td>' + name +
+            '</td></tr></thead><tbody>' + str + '</tbody></table>';
+    }
+
+    /* scores table */
     var content = '';
-    var table = $('<table class="highscore"><thead><tr><td>Player</td><td>Score</td></tr></thead></table>');
-
-    Helpers.take(this.players.sort(Helpers.byScore, true), 5).forEach(function(p) {
-        content += '<tr><td>' + p.getName() + '</td><td>' + Helpers.toCurrency(p.score) + '</td></tr>';
+    Helpers.take(this.players.sort(Helpers.byScore, true), 5).forEach(function(p, i) {
+        content += '<tr><td>' + (i+1) + '.</td><td>' + p.getName() + '</td><td>' +
+            Helpers.toCurrency(p.score) + '</td></tr>';
     });
 
-    /* append header */
-    element.append('<h3>Highscore</h3>');
+    div.append(getTable('Score', content));
 
-    /* append table */
-    element.append('<table class="highscore"><thead><tr><td>Player</td><td>Score</td></tr></thead>' +
-                '<tbody>' + content + '</tbody></table>');
+    /* scores per match table */
+    content = '';
+    Helpers.take(this.players.sort(Helpers.byScorePerMatch, true), 5).forEach(function(p, i) {
+        content += '<tr><td>' + (i+1) + '.</td><td>' + p.getName() + '</td><td>' +
+            Helpers.toCurrency(p.getScorePerMatch()) + ' (' + (p.played-p.substituted) + ')</td></tr>';
+    });
+
+    div.append(getTable('Score/match', content));
+
+    /* prepend table div */
+    element.prepend(div);
+
+    /* prepend header */
+    element.prepend('<h3>Highscores</h3>');
 }
 
 BVB.prototype.insertScores = function(scores) {

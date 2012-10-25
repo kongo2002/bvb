@@ -15,6 +15,7 @@ h1 {
 
 h2, h3, h4, h5, h6 {
     color: #333;
+    clear: both;
 }
 
 table {
@@ -132,4 +133,10 @@ div.chart {
 
 .tab a:hover {
     background: #444;
+}
+
+.highscore {
+    float: left;
+    padding-right: 2em;
+    padding-bottom: 2em;
 }
