@@ -811,14 +811,19 @@ function BVB() {
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Gündogan', 'Schieber', 'Perisic' ], true, 'CLGroupPhase');
 }
 
-BVB.prototype.activatePlayer = function(scores, link, id) {
+BVB.prototype.activatePlayer = function(scores, id, elem) {
+    var link = elem || $('#nav'+id);
+
     return function() {
+        /* hide all players and deactive all navigation buttons */
         scores.find('div.player').addClass('hidden');
         scores.find('ul.navigation li').removeClass('activetab');
 
+        /* activate player's navigation button */
         link.addClass('activetab');
 
-        scores.find(id).removeClass('hidden');
+        /* unhide player's details */
+        scores.find('#'+id).removeClass('hidden');
     }
 }
 
@@ -827,14 +832,14 @@ BVB.prototype.insertPlayers = function(scores) {
     var list = $('<ul class="navigation"></ul>');
 
     this.players.forEach(function(player, i, name) {
-        var id = '#' + name.toLowerCase();
+        var id = name.toLowerCase();
         var position = player.position.name.toLowerCase().replace(/[- ]/, '');
 
         var link = $('<li class="' + position + ' tab'
-            + '" id="nav'+i+'"><a href="'+id+'">' + name
+            + '" id="nav'+id+'"><a href="#'+id+'">' + name
             + '</a></li>');
 
-        link.on('click', self.activatePlayer(scores, link, id));
+        link.on('click', self.activatePlayer(scores, id, link));
 
         list.append(link);
     });
@@ -936,7 +941,8 @@ BVB.prototype.insertScores = function(scores) {
 
         /* add information rows */
         var addRow = function(name, value) {
-            table.append('<tr><td class="infoname">' + name + ':</td><td class="infovalue">' + value + '</td></tr>');
+            table.append('<tr><td class="infoname">' + name + ':</td><td class="infovalue">' +
+                    value + '</td></tr>');
         };
 
         addRow('Position', player.position.name);
@@ -1091,10 +1097,9 @@ $(function() {
     bvb.insertScores(scores);
 
     /* active 'team' statistics at first */
-    var teamTab = '#team';
-    bvb.activatePlayer(scores, $('#nav0'), teamTab)();
+    bvb.activatePlayer(scores, 'team')();
 
-    bvb.buildHighscore($(teamTab));
+    bvb.buildHighscore($('#team'));
 
     /* remove all script tags from html */
     $('script').remove();
