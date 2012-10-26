@@ -233,7 +233,19 @@ var Position = {
     DM : {
         name : 'Defensive midfield',
         goal : 200000,
-        assist : 100000
+        assist : 100000,
+        specials : [
+        {
+            name : 'No cards',
+            description : 'Finished a match without getting a yellow/red card',
+            pred : function(match) {
+                return match.played && !match.substituted &&
+                    match.yellow < 1 && match.red < 1;
+            },
+            func : function(match) {
+                return 25000;
+            }
+        }]
     },
     A : {
         name : 'Wing player',
