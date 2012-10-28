@@ -809,6 +809,16 @@ function BVB() {
             Gündogan : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Bender', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Gündogan', 'Schieber', 'Perisic' ], true, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 10, 27), 'SC Freibug', 2, 0, {
+            Subotic : { goals : 1, yellow : 1 },
+            Götze : { goals : 1 },
+            Reus : { assists : 1 },
+            Lewandowski : { assists : 1 },
+            Kehl : { yellow : 1 },
+            Gündogan : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Leitner', 'Schieber', 'Perisic' ]);
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
