@@ -812,13 +812,26 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 10, 27), 'SC Freibug', 2, 0, {
             Subotic : { goals : 1, yellow : 1 },
-            Götze : { goals : 1 },
+            Götze : { goals : 1, boni : [ Bonus.TOTD ] },
             Reus : { assists : 1 },
             Lewandowski : { assists : 1 },
             Kehl : { yellow : 1 },
             Gündogan : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Leitner', 'Schieber', 'Perisic' ]);
+
+    addMatch(Helpers.day(2012, 10, 30), 'VfR Aalen', 4, 1, {
+            Hummels : { goals : 1 },
+            Lewandowski : { assists : 2 },
+            Schmelzer : { goals : 1 },
+            Leitner : { assists : 1 },
+            Götze : { goals : 1 },
+            Schieber : { goals : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Leitner', 'Perisic', 'Schmelzer', 'Götze', 'Grosskreutz', 'Lewandowski'], [ 'Santana', 'Schieber', 'Kehl' ], false, 'Pokal');
+
+    addMatch(Helpers.day(2012, 11, 3), 'VfB Stuttgart', 0, 0, { },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Leitner', 'Schieber', 'Perisic' ], true);
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
