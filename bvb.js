@@ -698,10 +698,6 @@ function BVB() {
             player.addMatch(match);
         });
 
-        if (overall.goals != goals)
-            throw 'Number of goals (' + goals + ') does not match with the specified players\' scores ('
-                    + overall.goals + ')';
-
         self.players.Team.addMatch(overall);
         self.games.push(overall);
     }
@@ -832,6 +828,57 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 11, 3), 'VfB Stuttgart', 0, 0, { },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Leitner', 'Schieber', 'Perisic' ], true);
+
+    addMatch(Helpers.day(2012, 11, 6), 'Real Madrid', 2, 2, {
+        Reus : { goals : 1 },
+        Lewandowski : { assists : 1 },
+        Grosskreutz : { assists : 1 },
+        Hummels : { yellow : 1 },
+        Grosskreutz : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Kehl', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Leitner', 'Bender', 'Perisic' ], false, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 11, 10), 'FC Augsburg', 3, 1, {
+        Reus : { goals : 1, assists : 1 },
+        Lewandowski : { goals : 2 },
+        Götze : { assists : 1 },
+        Bender : { yellow : 1 },
+        Weidenfeller : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Bender', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Schieber', 'Leitner', 'Kirch' ]);
+
+    addMatch(Helpers.day(2012, 11, 17), 'Greuther Fürth', 3, 1, {
+        Lewandowski : { goals : 2, yellow : 1 },
+        Blaszczykowski : { assists : 1 },
+        Götze : { assists : 1, goals : 1 },
+        Perisic : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Perisic', 'Schmelzer', 'Götze', 'Blaszczykowski', 'Lewandowski'], [ 'Grosskreutz', 'Leitner', 'Reus' ],
+        true);
+
+    addMatch(Helpers.day(2012, 11, 21), 'Ajax Amsterdam', 4, 1, {
+        Reus : { goals : 1 },
+        Lewandowski : { goals : 2 },
+        Götze : { assists : 3, goals : 1, yellow : 1 },
+        Hummels : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Grosskreutz', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Perisic', 'Blaszczykowski', 'Schieber' ],
+        false, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 11, 24), '1. FSV Mainz', 2, 1, {
+        Reus : { assists : 1 },
+        Lewandowski : { goals : 2 },
+        Götze : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Blaszczykowski', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Perisic', 'Grosskreutz', 'Leitner' ]);
+
+    addMatch(Helpers.day(2012, 11, 27), 'Fortuna Düsseldorf', 1, 1, {
+        Blaszczykowski : { goals : 1 },
+        Grosskreutz : { assists : 1 },
+        Subotic : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Santana', 'Kehl', 'Bender', 'Blaszczykowski', 'Schmelzer', 'Grosskreutz', 'Reus', 'Lewandowski'], [ 'Perisic', 'Schieber', 'Leitner' ],
+        true);
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
