@@ -1051,30 +1051,45 @@ BVB.prototype.insertScores = function(scores) {
         elem.append('<h3>Development</h3>');
         elem.append(div);
 
+        var dayWidth = 24*60*60*1000;
+        var goalColor = 'rgba(248, 215, 99, 0.7)';
+        var assistColor = 'rgba(146, 113, 0, 0.7)';
+        var scoreColor = 'rgba(0, 0, 0, 0.7)';
+
         var chart = $.plot(div, [{
-            data : player.getScores(),
-            yaxis : 1,
-            color : '#f2bc00',
-            points : { show : true },
-            lines : { show : true },
-            label : 'Score (in €)',
-            shadowSize : 0
-        }, {
             data : player.getGoals(),
             yaxis : 2,
-            color : '#f8d763',
-            points : { show : true },
-            lines : { show : true },
+            color : goalColor,
+            bars : {
+                show : true,
+                lineWidth : 0,
+                fillColor : goalColor,
+                barWidth : dayWidth*2,
+                align : 'right'
+            },
             shadowSize : 0,
             label : 'Goals'
         }, {
             data : player.getAssists(),
             yaxis : 2,
-            color : '#584400',
-            points : { show : true },
-            lines : { show : true },
+            color : assistColor,
+            bars : {
+                show : true,
+                fillColor : assistColor,
+                lineWidth : 0,
+                barWidth : dayWidth*2,
+                align : 'left'
+            },
             shadowSize : 0,
             label : 'Assists'
+        }, {
+            data : player.getScores(),
+            yaxis : 1,
+            color : scoreColor,
+            points : { show : true },
+            lines : { show : true },
+            label : 'Score (in €)',
+            shadowSize : 0
         }],
         {
             grid : { hoverable : true },
