@@ -840,7 +840,7 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 11, 10), 'FC Augsburg', 3, 1, {
         Reus : { goals : 1, assists : 1 },
-        Lewandowski : { goals : 2 },
+        Lewandowski : { goals : 2, boni : [ Bonus.TOTD ] },
         Götze : { assists : 1 },
         Bender : { yellow : 1 },
         Weidenfeller : { yellow : 1 }
@@ -850,7 +850,7 @@ function BVB() {
     addMatch(Helpers.day(2012, 11, 17), 'Greuther Fürth', 3, 1, {
         Lewandowski : { goals : 2, yellow : 1 },
         Blaszczykowski : { assists : 1 },
-        Götze : { assists : 1, goals : 1 },
+        Götze : { assists : 1, goals : 1, boni : [ Bonus.TOTD ] },
         Perisic : { yellow : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Perisic', 'Schmelzer', 'Götze', 'Blaszczykowski', 'Lewandowski'], [ 'Grosskreutz', 'Leitner', 'Reus' ],
@@ -867,7 +867,9 @@ function BVB() {
 
     addMatch(Helpers.day(2012, 11, 24), '1. FSV Mainz', 2, 1, {
         Reus : { assists : 1 },
-        Lewandowski : { goals : 2 },
+        Bender : { boni : [ Bonus.TOTD ] },
+        Schmelzer : { boni : [ Bonus.TOTD ] },
+        Lewandowski : { goals : 2, boni : [ Bonus.TOTD ] },
         Götze : { assists : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Blaszczykowski', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Perisic', 'Grosskreutz', 'Leitner' ]);
@@ -879,6 +881,19 @@ function BVB() {
         },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Santana', 'Kehl', 'Bender', 'Blaszczykowski', 'Schmelzer', 'Grosskreutz', 'Reus', 'Lewandowski'], [ 'Perisic', 'Schieber', 'Leitner' ],
         true);
+
+    addMatch(Helpers.day(2012, 12, 1), 'Bayern München', 1, 1, {
+        Götze : { goals : 1, boni : [ Bonus.Bayern, Bonus.TOTD ] },
+        Weidenfeller : { boni : [ Bonus.TOTD ] }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Bender', 'Blaszczykowski', 'Schmelzer', 'Götze', 'Reus', 'Lewandowski'], [ 'Perisic', 'Schieber', 'Santana' ]);
+
+    addMatch(Helpers.day(2012, 12, 4), 'Manchester City', 1, 0, {
+        Schieber : { goals : 1, boni : [ Bonus.MatchWinningGoal ] },
+        Blaszczykowski : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Kirch', 'Santana', 'Hummels', 'Gündogan', 'Grosskreutz', 'Leitner', 'Schmelzer', 'Perisic', 'Reus', 'Schieber'], [ 'Blaszczykowski', 'Lewandowski', 'Bittencourt' ],
+        true, 'CLGroupPhase');
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
