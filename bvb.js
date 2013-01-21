@@ -933,8 +933,9 @@ function BVB() {
         Lewandowski : { goals : 1 },
         Santana : { goals : 1 },
         Gündogan : { boni : [ Bonus.TOTD ] },
+        Hummels : { boni : [ Bonus.TOTD ] },
         Piszczek : { assists : 2 },
-        Götze : { goals : 1, boni : [ Bonus.TOTD ] }
+        Götze : { goals : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Blaszczykowski', 'Bender' /*, 'Sahin' */ ]);
 }
