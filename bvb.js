@@ -894,6 +894,49 @@ function BVB() {
         },
         [ 'Weidenfeller', 'Kirch', 'Santana', 'Hummels', 'Gündogan', 'Grosskreutz', 'Leitner', 'Schmelzer', 'Perisic', 'Reus', 'Schieber'], [ 'Blaszczykowski', 'Lewandowski', 'Bittencourt' ],
         true, 'CLGroupPhase');
+
+    addMatch(Helpers.day(2012, 12, 8), 'VfL Wolfsburg', 2, 3, {
+        Blaszczykowski : { goals : 1 },
+        Reus : { goals : 1, yellow : 1 },
+        Schmelzer : { red : 1 },
+        Gündogan : { yellow : 1 },
+        Götze : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Blaszczykowski', 'Leitner', 'Schmelzer', 'Lewandowski', 'Reus', 'Götze'], [ 'Perisic', 'Schieber' ],
+        true);
+
+    addMatch(Helpers.day(2012, 12, 16), '1899 Hoffenheim', 3, 1, {
+        Reus : { assists : 1 },
+        Leitner : { assists : 1 },
+        Grosskreutz : { goals : 1 },
+        Götze : { goals : 1, boni : [ Bonus.TOTD ] },
+        Lewandowski : { goals : 1 },
+        Gündogan : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Blaszczykowski', 'Leitner', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Perisic', 'Kirch' /*, 'Hofmann' */ ]);
+
+    addMatch(Helpers.day(2012, 12, 19), 'Hannover 96', 5, 1, {
+        Blaszczykowski : { goals : 1 },
+        Grosskreutz : { assists : 1 },
+        Reus : { assists : 1 },
+        Lewandowski : { goals : 1, assists : 1 },
+        Bittencourt : { assists : 1 },
+        Götze : { goals : 3 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Blaszczykowski', 'Kehl', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Perisic', 'Schieber', 'Bittencourt' ],
+        true, 'Pokal');
+
+    addMatch(Helpers.day(2013, 1, 19), 'Werder Bremen', 5, 0, {
+        Blaszczykowski : { goals : 1 },
+        Grosskreutz : { assists : 1 },
+        Reus : { assists : 1, goals : 1 },
+        Lewandowski : { goals : 1 },
+        Santana : { goals : 1 },
+        Gündogan : { boni : [ Bonus.TOTD ] },
+        Piszczek : { assists : 2 },
+        Götze : { goals : 1, boni : [ Bonus.TOTD ] }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Blaszczykowski', 'Bender' /*, 'Sahin' */ ]);
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
