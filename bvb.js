@@ -938,6 +938,15 @@ function BVB() {
         Götze : { goals : 1 }
         },
         [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Blaszczykowski', 'Bender' /*, 'Sahin' */ ]);
+
+    addMatch(Helpers.day(2013, 1, 25), '1. FC Nürnberg', 3, 0, {
+        Blaszczykowski : { goals : 2 },
+        Reus : { assists : 1 },
+        Lewandowski : { goals : 1 },
+        Piszczek : { assists : 1 },
+        Götze : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Leitner', 'Bender' /*, 'Sahin' */ ], true);
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
