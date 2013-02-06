@@ -4,7 +4,18 @@ class User
 {
     public static function load($id)
     {
-        return "Got user " . $id;
+        if ($id < 1)
+            throw new ApiException("there is no user with ID '$id'");
+
+        return array(
+            'id' => $id,
+            'firstName' => 'some',
+            'lastName' => 'one',
+            'addresses' => array(
+                array(
+                    'street' => 'some',
+                    'city' => 'where',
+                    'isPrimary' => true)));
     }
 }
 
@@ -30,7 +41,8 @@ class UserController
     {
         $username = $_POST['username'];
         $password = $_POST['password'];
-        // validate input and log the user in
+
+        // TODO: validate input and log the user in
     }
 
     /**
