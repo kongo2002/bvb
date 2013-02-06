@@ -47,7 +47,7 @@ class UserController
             $user = $_SESSION['user'];
         }
         else {
-            throw new ApiException(68, 'there is no such user');
+            throw new ApiException('there is no such user');
         }
 
         return $user; // serializes object into JSON

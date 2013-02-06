@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Constants used in RestServer Class.
+ * Format constants
  */
 class RestFormat
 {
@@ -38,7 +38,8 @@ class RestServer
     /**
      * The constructor.
      *
-     * @param string $mode The mode, either debug or production
+     * @param string $mode  The mode, either debug or production
+     * @param string $realm The server's realm
      */
     public function  __construct($mode = 'debug', $realm = 'Rest Server')
     {
@@ -358,10 +359,11 @@ class RestServer
 
         if ($this->format == RestFormat::JSON)
         {
-            $data = array('message' => $message, 'errorCode' => $code, 'success' => false);
-            $data = json_encode($data);
+            $data = $code > 0
+                ? array('message' => $message, 'errorCode' => $code, 'success' => false)
+                : array('message' => $message, 'success' => false);
 
-            echo $data;
+            echo json_encode($data);
         }
         else
             echo $message;
@@ -502,7 +504,7 @@ class RestException extends Exception
 
 class ApiException extends Exception
 {
-    public function __construct($errorCode, $message)
+    public function __construct($message, $errorCode = 0)
     {
         parent::__construct($message, $errorCode);
     }
