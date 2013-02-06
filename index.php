@@ -14,7 +14,7 @@ spl_autoload_register();
 $mode = 'debug';
 $server = new RestServer($mode);
 
-// uncomment momentarily to clear the cache if classes change in production mode
+// uncomment to clear the cache in production mode
 $server->refreshCache();
 
 $server->addClass('BaseController', '/rest');

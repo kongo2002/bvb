@@ -17,6 +17,13 @@ class User
                     'city' => 'where',
                     'isPrimary' => true)));
     }
+
+    public static function save($user)
+    {
+        // TODO
+
+        throw new ApiException("not implemented yet", 99);
+    }
 }
 
 class UserController
@@ -30,7 +37,7 @@ class UserController
     public function getUser($id = null)
     {
         if ($id) {
-            $user = User::load($id); // possible user loading method
+            $user = User::load($id);
         } else if (isset($_SESSION)) {
             $user = $_SESSION['user'];
         }
@@ -38,7 +45,7 @@ class UserController
             throw new ApiException('there is no such user');
         }
 
-        return $user; // serializes object into JSON
+        return $user;
     }
 
     /**
@@ -49,10 +56,16 @@ class UserController
      */
     public function saveUser($id = null, $data)
     {
-        // ... validate $data properties such as $data->username, $data->firstName, etc.
+        // TODO: validate input data
+
+        if ($data === null)
+            throw new ApiException('no or invalid user object given');
+
         $data->id = $id;
-        $user = User::saveUser($data); // saving the user to the database
-        return $user; // returning the updated or newly created user object
+        $user = User::save($data);
+
+        // return the created user object
+        return $user;
     }
 }
 
