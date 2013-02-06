@@ -22,34 +22,10 @@ class User
 class UserController
 {
     /**
-     * Returns a JSON string object to the browser when hitting the root of the domain
-     *
-     * @url GET /
-     */
-    public function test()
-    {
-        return "Hello World";
-    }
-
-    /**
-     * Logs in a user with the given username and password POSTed. Though true
-     * REST doesn't believe in sessions, it is often desirable for an AJAX server.
-     *
-     * @url POST /login
-     */
-    public function login()
-    {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        // TODO: validate input and log the user in
-    }
-
-    /**
      * Gets the user by id or current user
      *
-     * @url GET /users/current
-     * @url GET /users/$id
+     * @url GET /user/current
+     * @url GET /user/$id
      */
     public function getUser($id = null)
     {
@@ -68,8 +44,8 @@ class UserController
     /**
      * Saves a user to the database
      *
-     * @url POST /users
-     * @url PUT /users/$id
+     * @url POST /user
+     * @url PUT /user/$id
      */
     public function saveUser($id = null, $data)
     {

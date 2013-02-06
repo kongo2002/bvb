@@ -1,6 +1,10 @@
 <?php
 
+// load server logic
 require_once('server.php');
+
+// load controllers
+require_once('base.php');
 require_once('user.php');
 
 // don't load our classes unless we use them
@@ -13,7 +17,8 @@ $server = new RestServer($mode);
 // uncomment momentarily to clear the cache if classes change in production mode
 $server->refreshCache();
 
-$server->addClass('UserController', '/rest');
+$server->addClass('BaseController', '/rest');
+$server->addClass('UserController', '/rest/users');
 
 $server->handle();
 
