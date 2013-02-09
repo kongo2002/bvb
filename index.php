@@ -3,6 +3,9 @@
 // load server logic
 require_once('server.php');
 
+// load database
+require_once('database.inc.php');
+
 // load controllers
 require_once('base.php');
 require_once('user.php');
