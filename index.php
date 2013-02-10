@@ -3,12 +3,10 @@
 // load server logic
 require_once('server.php');
 
-// load database
-require_once('database.inc.php');
-
 // load controllers
 require_once('base.php');
 require_once('user.php');
+require_once('player.php');
 
 // don't load our classes unless we use them
 spl_autoload_register();
@@ -22,6 +20,7 @@ $server->refreshCache();
 
 $server->addClass('BaseController', '/rest');
 $server->addClass('UserController', '/rest/users');
+$server->addClass('PlayerController', '/rest/players');
 
 $server->handle();
 

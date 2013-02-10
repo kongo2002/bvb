@@ -30,28 +30,4 @@ class SafePDO extends PDO
     }
 }
 
-try
-{
-    $db = new SafePDO('mysql:host='.DB_SERVER.';dbname='.DB_DATABASE,
-        DB_USER, DB_PW);
-
-    $id = 6;
-
-    $stmt = $db->prepare('SELECT * FROM artikel WHERE id > :id');
-    $stmt->execute(array(':id' => $id));
-
-    foreach ($stmt as $row)
-    {
-        print_r($row);
-    }
-
-    # close the connection
-    $db = null;
-}
-catch (PDOException $ex)
-{
-    print "Connection error: " . $ex->getMessage();
-    die();
-}
-
 ?>
