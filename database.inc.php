@@ -10,6 +10,12 @@ class SafePDO extends PDO
         die('Unhandled exception: ' . $exception->getMessage());
     }
 
+    public static function create()
+    {
+        return new SafePDO('mysql:host='.DB_SERVER.';dbname='.DB_DATABASE,
+            DB_USER, DB_PW);
+    }
+
     public function __construct($conn, $user='', $pw='', $options=array())
     {
         # set custom exception handler for the class construction

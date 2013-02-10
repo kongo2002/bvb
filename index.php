@@ -7,6 +7,7 @@ require_once('server.php');
 require_once('base.php');
 require_once('user.php');
 require_once('player.php');
+require_once('match.php');
 
 // don't load our classes unless we use them
 spl_autoload_register();
@@ -21,6 +22,7 @@ $server->refreshCache();
 $server->addClass('BaseController', '/rest');
 $server->addClass('UserController', '/rest/users');
 $server->addClass('PlayerController', '/rest/players');
+$server->addClass('MatchController', '/rest/matches');
 
 $server->handle();
 

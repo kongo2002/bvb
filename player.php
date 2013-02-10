@@ -27,8 +27,7 @@ class PlayerController
      */
     public function playerList()
     {
-        $db = new SafePDO('mysql:host='.DB_SERVER.';dbname='.DB_DATABASE,
-            DB_USER, DB_PW);
+        $db = SafePDO::create();
 
         $players = Player::getList($db);
 
