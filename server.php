@@ -256,6 +256,13 @@ class RestServer
                         $params[$args['data']] = $this->data;
                         $call[2] = $params;
                     }
+                    else
+                    {
+                        # we pass an empty array so we can later append
+                        # an optional 'database' parameter
+                        $call[2] = array();
+                    }
+
                     return $call;
                 }
             }
