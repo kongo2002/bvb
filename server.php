@@ -246,7 +246,7 @@ class RestServer
         {
             $args = $call[2];
 
-            if (!strstr($url, '$'))
+            if (strpos($url, '$') === false)
             {
                 if ($url == $this->url)
                 {
