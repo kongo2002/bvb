@@ -26,16 +26,12 @@ class MatchController
      * Get a short match information
      *
      * @url GET /match/$id
+     *
+     * @useDb
      */
-    public function getMatch($id)
+    public function getMatch($id, $db)
     {
-        $db = SafePDO::create();
-
-        $match = Match::get($db, $id);
-
-        $db = null;
-
-        return $match;
+        return Match::get($db, $id);
     }
 }
 

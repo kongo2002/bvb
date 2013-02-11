@@ -1,5 +1,7 @@
 <?php
 
+require_once('database.inc.php');
+
 /**
  * Format constants
  */
@@ -81,67 +83,91 @@ class RestServer
         $this->method = $this->getMethod();
         $this->format = $this->getFormat();
 
-        if ($this->method == 'PUT' || $this->method == 'POST') {
+        if ($this->method == 'PUT' || $this->method == 'POST')
             $this->data = $this->getData();
-        }
 
-        list($obj, $method, $params, $this->params, $noAuth) = $this->findUrl();
+        list($obj, $method, $params, $this->params, $noAuth, $useDb) = $this->findUrl();
 
-        if ($obj) {
-            if (is_string($obj)) {
-                if (class_exists($obj)) {
+        if ($obj)
+        {
+            if (is_string($obj))
+            {
+                if (class_exists($obj))
                     $obj = new $obj();
-                } else {
-                    throw new Exception("Class $obj does not exist");
-                }
+                else
+                    throw new Exception("Class '$obj' does not exist");
             }
 
             $obj->server = $this;
 
-            try {
-                if (method_exists($obj, 'init')) {
+            try
+            {
+                # optional initialization routine
+                if (method_exists($obj, 'init'))
                     $obj->init();
-                }
 
-                if (!$noAuth && method_exists($obj, 'authorize')) {
-                    if (!$obj->authorize()) {
+                # method uses authorization
+                if (!$noAuth && method_exists($obj, 'authorize'))
+                {
+                    if (!$obj->authorize())
+                    {
                         $this->sendData($this->unauthorized(true));
                         exit;
                     }
                 }
 
+                # method uses database
+                if ($useDb)
+                {
+                    try
+                    {
+                        $db = SafePDO::create();
+                        $params[] = $db;
+                    }
+                    catch (Exception $e)
+                    {
+                        return $this->sendError($e->getCode(),
+                            'failed to initialize database connection');
+                    }
+                }
+
                 $result = call_user_func_array(array($obj, $method), $params);
-            } catch (RestException $e) {
+
+                # close database connection (if existing)
+                $db = null;
+            }
+            catch (RestException $e)
+            {
                 return $this->handleError($e->getCode(), $e->getMessage());
-            } catch (ApiException $e) {
+            }
+            catch (ApiException $e)
+            {
                 return $this->sendError($e->getCode(), $e->getMessage());
             }
 
-            if ($result !== null) {
+            if ($result !== null)
                 $this->sendData($result);
-            }
-        } else {
-            $this->handleError(404);
         }
+        else
+            $this->handleError(404);
     }
 
     public function addClass($class, $basePath = '')
     {
         $this->loadCache();
 
-        if (!$this->cached) {
-            if (is_string($class) && !class_exists($class)){
+        if (!$this->cached)
+        {
+            if (is_string($class) && !class_exists($class))
                 throw new Exception('Invalid method or class');
-            } elseif (!is_string($class) && !is_object($class)) {
+            elseif (!is_string($class) && !is_object($class))
                 throw new Exception('Invalid method or class; must be a classname or object');
-            }
 
-            if (substr($basePath, 0, 1) == '/') {
+            if (substr($basePath, 0, 1) == '/')
                 $basePath = substr($basePath, 1);
-            }
-            if ($basePath && substr($basePath, -1) != '/') {
+
+            if ($basePath && substr($basePath, -1) != '/')
                 $basePath .= '/';
-            }
 
             $this->generateMap($class, $basePath);
         }
@@ -206,6 +232,8 @@ class RestServer
     protected function findUrl()
     {
         $urls = $this->map[$this->method];
+
+        # there is no call of the current HTTP method defined
         if (!$urls) return null;
 
         foreach ($urls as $url => $call) {
@@ -269,6 +297,7 @@ class RestServer
         foreach ($methods as $method) {
             $doc = $method->getDocComment();
             $noAuth = strpos($doc, '@noAuth') !== false;
+            $useDatabase = strpos($doc, '@useDb') !== false;
             if (preg_match_all('/@url[ \t]+(GET|POST|PUT|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER)) {
 
                 $params = $method->getParameters();
@@ -284,9 +313,10 @@ class RestServer
                     foreach ($params as $param) {
                         $args[$param->getName()] = $param->getPosition();
                     }
-                    $call[] = $args;
-                    $call[] = null;
-                    $call[] = $noAuth;
+                    $call[] = $args;        # function arguments map
+                    $call[] = null;         # separator
+                    $call[] = $noAuth;      # no authorization call?
+                    $call[] = $useDatabase; # database call?
 
                     $this->map[$httpMethod][$url] = $call;
                 }

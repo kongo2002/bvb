@@ -1,7 +1,5 @@
 <?php
 
-require_once('database.inc.php');
-
 class Player
 {
     public static function getList($db)
@@ -52,48 +50,36 @@ class PlayerController
      * Get a list of players
      *
      * @url GET /
+     *
+     * @useDb
      */
-    public function playerList()
+    public function playerList($db)
     {
-        $db = SafePDO::create();
-
-        $players = Player::getList($db);
-
-        $db = null;
-
-        return $players;
+        return Player::getList($db);
     }
 
     /**
      * Get a player's detail information
      *
      * @url GET /player/$id
+     *
+     * @useDb
      */
-    public function playerInfo($id)
+    public function playerInfo($id, $db)
     {
-        $db = SafePDO::create();
-
-        $player = Player::get($db, $id);
-
-        $db = null;
-
-        return $player;
+        return Player::get($db, $id);
     }
 
     /**
      * Get all possible positions
      *
      * @url GET /positions
+     *
+     * @useDb
      */
-    public function positions()
+    public function positions($db)
     {
-        $db = SafePDO::create();
-
-        $positions = Position::getAll($db);
-
-        $db = null;
-
-        return $positions;
+        return Position::getAll($db);
     }
 }
 
