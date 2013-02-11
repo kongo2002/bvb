@@ -8,9 +8,15 @@ class Match
             'opponent_goals,homegame '.
             'FROM matches INNER JOIN teams ON teams.id=opponent INNER JOIN goals ON '.
             'goals.match=matches.id WHERE matches.id = :id;');
+
         $cmd->execute(array(':id' => $id));
 
-        return $cmd->fetchAll(PDO::FETCH_ASSOC);
+        $match = $cmd->fetch(PDO::FETCH_ASSOC);
+
+        if ($match == null || $match['date'] == null)
+            throw new ApiException("there is no match with ID '$id'");
+
+        return $match;
     }
 }
 
