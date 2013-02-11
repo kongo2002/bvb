@@ -70,10 +70,10 @@ class RestServer
 
     public function unauthorized($ask = false)
     {
-        if ($ask) {
+        if ($ask)
             header("WWW-Authenticate: Basic realm=\"$this->realm\"");
-        }
-        throw new RestException(401, "You are not authorized to access this resource.");
+
+        throw new RestException(401, 'You are not authorized to access this resource.');
     }
 
 
@@ -121,7 +121,10 @@ class RestServer
                 {
                     try
                     {
+                        # create new database instance
                         $db = SafePDO::create();
+
+                        # append database instance to parameter array
                         $params[] = $db;
                     }
                     catch (Exception $e)
@@ -181,12 +184,13 @@ class RestServer
     public function handleError($statusCode, $errorMessage = null)
     {
         $method = "handle$statusCode";
-        foreach ($this->errorClasses as $class) {
-            if (is_object($class)) {
+
+        foreach ($this->errorClasses as $class)
+        {
+            if (is_object($class))
                 $reflection = new ReflectionObject($class);
-            } elseif (class_exists($class)) {
+            elseif (class_exists($class))
                 $reflection = new ReflectionClass($class);
-            }
 
             if ($reflection->hasMethod($method))
             {
@@ -196,7 +200,8 @@ class RestServer
             }
         }
 
-        $message = $this->codes[$statusCode] . ($errorMessage && $this->mode == 'debug' ? ': ' . $errorMessage : '');
+        $message = $this->codes[$statusCode] .
+            ($errorMessage && $this->mode == 'debug' ? ': ' . $errorMessage : '');
 
         $this->setStatus($statusCode);
         $this->sendError($statusCode, $message);
@@ -204,28 +209,29 @@ class RestServer
 
     protected function loadCache()
     {
-        if ($this->cached !== null) {
-            return;
-        }
+        if ($this->cached !== null) return;
 
         $this->cached = false;
 
-        if ($this->mode == 'production') {
-            if (function_exists('apc_fetch')) {
+        if ($this->mode == 'production')
+        {
+            if (function_exists('apc_fetch'))
                 $map = apc_fetch('urlMap');
-            } elseif (file_exists($this->cacheDir . '/urlMap.cache')) {
+            elseif (file_exists($this->cacheDir . '/urlMap.cache'))
                 $map = unserialize(file_get_contents($this->cacheDir . '/urlMap.cache'));
-            }
-            if ($map && is_array($map)) {
+
+            if ($map && is_array($map))
+            {
                 $this->map = $map;
                 $this->cached = true;
             }
-        } else {
-            if (function_exists('apc_delete')) {
+        }
+        else
+        {
+            if (function_exists('apc_delete'))
                 apc_delete('urlMap');
-            } else {
+            else
                 @unlink($this->cacheDir . '/urlMap.cache');
-            }
         }
     }
 
@@ -236,45 +242,58 @@ class RestServer
         # there is no call of the current HTTP method defined
         if (!$urls) return null;
 
-        foreach ($urls as $url => $call) {
+        foreach ($urls as $url => $call)
+        {
             $args = $call[2];
 
-            if (!strstr($url, '$')) {
-                if ($url == $this->url) {
-                    if (isset($args['data'])) {
+            if (!strstr($url, '$'))
+            {
+                if ($url == $this->url)
+                {
+                    if (isset($args['data']))
+                    {
                         $params = array_fill(0, $args['data'] + 1, null);
                         $params[$args['data']] = $this->data;
                         $call[2] = $params;
                     }
                     return $call;
                 }
-            } else {
+            }
+            else
+            {
                 $regex = preg_replace('/\\\\\$([\w\d]+)\.\.\./', '(?P<$1>.+)', str_replace('\.\.\.', '...', preg_quote($url)));
                 $regex = preg_replace('/\\\\\$([\w\d]+)/', '(?P<$1>[^\/]+)', $regex);
-                if (preg_match(":^$regex$:", urldecode($this->url), $matches)) {
+
+                if (preg_match(":^$regex$:", urldecode($this->url), $matches))
+                {
                     $params = array();
                     $paramMap = array();
-                    if (isset($args['data'])) {
-                        $params[$args['data']] = $this->data;
-                    }
 
-                    foreach ($matches as $arg => $match) {
-                        if (is_numeric($arg)) continue;
+                    if (isset($args['data']))
+                        $params[$args['data']] = $this->data;
+
+                    foreach ($matches as $arg => $match)
+                    {
+                        if (is_numeric($arg))
+                            continue;
+
                         $paramMap[$arg] = $match;
 
-                        if (isset($args[$arg])) {
+                        if (isset($args[$arg]))
                             $params[$args[$arg]] = $match;
-                        }
                     }
+
                     ksort($params);
-                    // make sure we have all the params we need
+                    # make sure we have all the params we need
                     end($params);
                     $max = key($params);
-                    for ($i = 0; $i < $max; $i++) {
-                        if (!key_exists($i, $params)) {
+
+                    for ($i = 0; $i < $max; $i++)
+                    {
+                        if (!key_exists($i, $params))
                             $params[$i] = null;
-                        }
                     }
+
                     ksort($params);
                     $call[2] = $params;
                     $call[3] = $paramMap;
@@ -286,33 +305,37 @@ class RestServer
 
     protected function generateMap($class, $basePath)
     {
-        if (is_object($class)) {
+        if (is_object($class))
             $reflection = new ReflectionObject($class);
-        } elseif (class_exists($class)) {
+        elseif (class_exists($class))
             $reflection = new ReflectionClass($class);
-        }
 
         $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
-        foreach ($methods as $method) {
+        foreach ($methods as $method)
+        {
             $doc = $method->getDocComment();
             $noAuth = strpos($doc, '@noAuth') !== false;
             $useDatabase = strpos($doc, '@useDb') !== false;
-            if (preg_match_all('/@url[ \t]+(GET|POST|PUT|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER)) {
 
+            if (preg_match_all('/@url[ \t]+(GET|POST|PUT|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER))
+            {
                 $params = $method->getParameters();
 
-                foreach ($matches as $match) {
+                foreach ($matches as $match)
+                {
                     $httpMethod = $match[1];
                     $url = $basePath . $match[2];
-                    if ($url && $url[strlen($url) - 1] == '/') {
+
+                    if ($url && $url[strlen($url) - 1] == '/')
                         $url = substr($url, 0, -1);
-                    }
+
                     $call = array($class, $method->getName());
                     $args = array();
-                    foreach ($params as $param) {
+
+                    foreach ($params as $param)
                         $args[$param->getName()] = $param->getPosition();
-                    }
+
                     $call[] = $args;        # function arguments map
                     $call[] = null;         # separator
                     $call[] = $noAuth;      # no authorization call?
@@ -327,11 +350,11 @@ class RestServer
     public function getPath()
     {
         $path = substr(preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']), 1);
-        if ($path[strlen($path) - 1] == '/') {
-            $path = substr($path, 0, -1);
-        }
 
-        // remove root from path
+        if ($path[strlen($path) - 1] == '/')
+            $path = substr($path, 0, -1);
+
+        # remove root from path
         if ($this->root)
             $path = str_replace($this->root, '', $path);
 
@@ -341,36 +364,43 @@ class RestServer
     public function getMethod()
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        $override = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : (isset($_GET['method']) ? $_GET['method'] : '');
-        if ($method == 'POST' && strtoupper($override) == 'PUT') {
+        $override = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])
+            ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
+            : (isset($_GET['method']) ? $_GET['method'] : '');
+
+        if ($method == 'POST' && strtoupper($override) == 'PUT')
             $method = 'PUT';
-        } elseif ($method == 'POST' && strtoupper($override) == 'DELETE') {
+        elseif ($method == 'POST' && strtoupper($override) == 'DELETE')
             $method = 'DELETE';
-        }
+
         return $method;
     }
 
     public function getFormat()
     {
         $format = RestFormat::PLAIN;
-        $accept_mod = preg_replace('/\s+/i', '', $_SERVER['HTTP_ACCEPT']); // ensures that exploding the HTTP_ACCEPT string does not get confused by whitespaces
+
+        # ensures that exploding the HTTP_ACCEPT string does not get confused by whitespaces
+        $accept_mod = preg_replace('/\s+/i', '', $_SERVER['HTTP_ACCEPT']);
         $accept = explode(',', $accept_mod);
         $override = '';
 
-        if (isset($_REQUEST['format']) || isset($_SERVER['HTTP_FORMAT'])) {
-            // give GET/POST precedence over HTTP request headers
+        if (isset($_REQUEST['format']) || isset($_SERVER['HTTP_FORMAT']))
+        {
+            # give GET/POST precedence over HTTP request headers
             $override = isset($_SERVER['HTTP_FORMAT']) ? $_SERVER['HTTP_FORMAT'] : '';
             $override = isset($_REQUEST['format']) ? $_REQUEST['format'] : $override;
             $override = trim($override);
         }
 
-        // Give GET parameters precedence before all other options to alter the format
+        # Give GET parameters precedence before all other options to alter the format
         $override = isset($_GET['format']) ? $_GET['format'] : $override;
-        if (isset(RestFormat::$formats[$override])) {
+
+        if (isset(RestFormat::$formats[$override]))
             $format = RestFormat::$formats[$override];
-        } elseif (in_array(RestFormat::JSON, $accept)) {
+        elseif (in_array(RestFormat::JSON, $accept))
             $format = RestFormat::JSON;
-        }
+
         return $format;
     }
 
@@ -383,8 +413,8 @@ class RestServer
 
     public function sendError($code, $message)
     {
-        header("Cache-Control: no-cache, must-revalidate");
-        header("Expires: 0");
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Expires: 0');
         header('Content-Type: ' . $this->format);
 
         if ($this->format == RestFormat::JSON)
@@ -405,14 +435,15 @@ class RestServer
         header("Expires: 0");
         header('Content-Type: ' . $this->format);
 
-        if (is_object($data) && method_exists($data, '__keepOut')) {
+        if (is_object($data) && method_exists($data, '__keepOut'))
+        {
             $data = clone $data;
-            foreach ($data->__keepOut() as $prop) {
+            foreach ($data->__keepOut() as $prop)
                 unset($data->$prop);
-            }
         }
 
-        if ($this->format == RestFormat::JSON) {
+        if ($this->format == RestFormat::JSON)
+        {
             $data = array('data' => $data, 'success' => true);
             $data = json_encode($data);
         }
@@ -425,65 +456,6 @@ class RestServer
         $code .= ' ' . $this->codes[strval($code)];
         header("{$_SERVER['SERVER_PROTOCOL']} $code");
     }
-
-    // Pretty print some JSON
-    private function json_format($json)
-    {
-        $tab = "  ";
-        $new_json = "";
-        $indent_level = 0;
-        $in_string = false;
-
-        $len = strlen($json);
-
-        for($c = 0; $c < $len; $c++) {
-            $char = $json[$c];
-            switch($char) {
-            case '{':
-            case '[':
-                if(!$in_string) {
-                    $new_json .= $char . "\n" . str_repeat($tab, $indent_level+1);
-                    $indent_level++;
-                } else {
-                    $new_json .= $char;
-                }
-                break;
-            case '}':
-            case ']':
-                if(!$in_string) {
-                    $indent_level--;
-                    $new_json .= "\n" . str_repeat($tab, $indent_level) . $char;
-                } else {
-                    $new_json .= $char;
-                }
-                break;
-            case ',':
-                if(!$in_string) {
-                    $new_json .= ",\n" . str_repeat($tab, $indent_level);
-                } else {
-                    $new_json .= $char;
-                }
-                break;
-            case ':':
-                if(!$in_string) {
-                    $new_json .= ": ";
-                } else {
-                    $new_json .= $char;
-                }
-                break;
-            case '"':
-                if($c > 0 && $json[$c-1] != '\\') {
-                    $in_string = !$in_string;
-                }
-            default:
-                $new_json .= $char;
-                break;
-            }
-        }
-
-        return $new_json;
-    }
-
 
     private $codes = array(
         '100' => 'Continue',
