@@ -12,7 +12,7 @@ class Player
 
         $cmd = $db->query('SELECT id,firstname,lastname FROM players;');
 
-        return array_map($func, $cmd->fetchAll());
+        return array_map($func, $cmd->fetchAll(PDO::FETCH_NUM));
     }
 
     public static function get($db, $id)

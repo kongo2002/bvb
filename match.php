@@ -26,6 +26,23 @@ class Match
         return $match;
     }
 
+    public static function getList($db)
+    {
+        $cmd = $db->query('SELECT matches.id,name,date,homegame FROM matches '.
+            'INNER JOIN teams ON teams.id=matches.opponent '.
+            'ORDER BY date ASC;');
+
+        $func = function($m)
+        {
+            return array('id' => $m[0],
+                'opponent' => $m[1],
+                'date' => $m[2],
+                'homegame' => $m[3] > 0 ? true : false);
+        };
+
+        return array_map($func, $cmd->fetchAll(PDO::FETCH_NUM));
+    }
+
     public static function getMatchPlayers($db, $id)
     {
         # get participating players
@@ -75,6 +92,16 @@ class MatchController
         $match['substitutes'] = $subs;
 
         return $match;
+    }
+
+    /**
+     * Get a list of all matches
+     *
+     * @url GET /
+     */
+    public function getMatchList()
+    {
+        return Match::getList($this->database);
     }
 }
 
