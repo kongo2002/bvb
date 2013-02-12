@@ -26,12 +26,10 @@ class MatchController
      * Get a short match information
      *
      * @url GET /match/$id
-     *
-     * @useDb
      */
-    public function getMatch($id, $db)
+    public function getMatch($id)
     {
-        return Match::get($db, $id);
+        return Match::get($this->database, $id);
     }
 }
 

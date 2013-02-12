@@ -86,7 +86,7 @@ class RestServer
         if ($this->method == 'PUT' || $this->method == 'POST')
             $this->data = $this->getData();
 
-        list($obj, $method, $params, $this->params, $noAuth, $useDb) = $this->findUrl();
+        list($obj, $method, $params, $this->params, $noAuth, $noDb) = $this->findUrl();
 
         if ($obj)
         {
@@ -117,15 +117,12 @@ class RestServer
                 }
 
                 # method uses database
-                if ($useDb)
+                if (!$noDb)
                 {
                     try
                     {
                         # create new database instance
-                        $db = SafePDO::create();
-
-                        # append database instance to parameter array
-                        $params[] = $db;
+                        $obj->database = SafePDO::create();
                     }
                     catch (Exception $e)
                     {
@@ -137,7 +134,7 @@ class RestServer
                 $result = call_user_func_array(array($obj, $method), $params);
 
                 # close database connection (if existing)
-                $db = null;
+                $obj->database = null;
             }
             catch (RestException $e)
             {
@@ -256,12 +253,6 @@ class RestServer
                         $params[$args['data']] = $this->data;
                         $call[2] = $params;
                     }
-                    else
-                    {
-                        # we pass an empty array so we can later append
-                        # an optional 'database' parameter
-                        $call[2] = array();
-                    }
 
                     return $call;
                 }
@@ -323,7 +314,7 @@ class RestServer
         {
             $doc = $method->getDocComment();
             $noAuth = strpos($doc, '@noAuth') !== false;
-            $useDatabase = strpos($doc, '@useDb') !== false;
+            $noDatabase = strpos($doc, '@noDb') !== false;
 
             if (preg_match_all('/@url[ \t]+(GET|POST|PUT|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER))
             {
@@ -346,7 +337,7 @@ class RestServer
                     $call[] = $args;        # function arguments map
                     $call[] = null;         # separator
                     $call[] = $noAuth;      # no authorization call?
-                    $call[] = $useDatabase; # database call?
+                    $call[] = $noDatabase;  # database call?
 
                     $this->map[$httpMethod][$url] = $call;
                 }

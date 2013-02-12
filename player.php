@@ -50,36 +50,30 @@ class PlayerController
      * Get a list of players
      *
      * @url GET /
-     *
-     * @useDb
      */
     public function playerList($db)
     {
-        return Player::getList($db);
+        return Player::getList($this->database);
     }
 
     /**
      * Get a player's detail information
      *
      * @url GET /player/$id
-     *
-     * @useDb
      */
-    public function playerInfo($id, $db)
+    public function playerInfo($id)
     {
-        return Player::get($db, $id);
+        return Player::get($this->database, $id);
     }
 
     /**
      * Get all possible positions
      *
      * @url GET /positions
-     *
-     * @useDb
      */
-    public function positions($db)
+    public function positions()
     {
-        return Position::getAll($db);
+        return Position::getAll($this->database);
     }
 }
 
