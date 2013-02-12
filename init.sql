@@ -1,28 +1,3 @@
-DROP TABLE IF EXISTS `assists`;
-CREATE TABLE `assists` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `match` int(11) NOT NULL,
-  `player` int(11) NOT NULL,
-  `assists` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `fk_as_match_idx` (`match`),
-  KEY `fk_as_player_idx` (`player`),
-  CONSTRAINT `fk_as_match` FOREIGN KEY (`match`) REFERENCES `matches` (`id`) ON UPDATE NO ACTION,
-  CONSTRAINT `fk_as_player` FOREIGN KEY (`player`) REFERENCES `players` (`id`) ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-DROP TABLE IF EXISTS `goals`;
-CREATE TABLE `goals` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `player` int(11) NOT NULL,
-  `match` int(11) NOT NULL,
-  `goals` tinyint(2) NOT NULL DEFAULT '1',
-  `owngoal` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_match_idx` (`match`),
-  KEY `fk_player_idx` (`player`),
-  CONSTRAINT `fk_match` FOREIGN KEY (`match`) REFERENCES `matches` (`id`) ON UPDATE NO ACTION,
-  CONSTRAINT `fk_player` FOREIGN KEY (`player`) REFERENCES `players` (`id`) ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `matches`;
 CREATE TABLE `matches` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -37,6 +12,20 @@ CREATE TABLE `matches` (
   CONSTRAINT `fk_opponent` FOREIGN KEY (`opponent`) REFERENCES `teams` (`id`) ON UPDATE NO ACTION,
   CONSTRAINT `fk_tournament` FOREIGN KEY (`tournament`) REFERENCES `tournaments` (`id`) ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `matchevents`;
+CREATE TABLE `matchevents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `match` int(11) NOT NULL,
+  `player` int(11) NOT NULL,
+  `goals` int(11) NOT NULL DEFAULT '0',
+  `owngoals` int(11) NOT NULL DEFAULT '0',
+  `assists` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_me_player_idx` (`player`),
+  KEY `fk_me_match_idx` (`match`),
+  CONSTRAINT `fk_me_player` FOREIGN KEY (`player`) REFERENCES `players` (`id`) ON UPDATE NO ACTION,
+  CONSTRAINT `fk_me_match` FOREIGN KEY (`match`) REFERENCES `matches` (`id`) ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `matchup`;
 CREATE TABLE `matchup` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

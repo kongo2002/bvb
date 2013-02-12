@@ -4,10 +4,11 @@ class Match
 {
     public static function get($db, $id)
     {
-        $cmd = $db->prepare('SELECT date,teams.name,count(goals.goals) as goals,'.
-            'opponent_goals,homegame '.
-            'FROM matches INNER JOIN teams ON teams.id=opponent INNER JOIN goals ON '.
-            'goals.match=matches.id WHERE matches.id = :id;');
+        $cmd = $db->prepare('SELECT date,teams.name,sum(matchevents.goals) as goals,'.
+            'opponent_goals,homegame FROM matches '.
+            'INNER JOIN teams ON teams.id=opponent '.
+            'INNER JOIN matchevents ON matchevents.match=matches.id '.
+            'WHERE matches.id = :id;');
 
         $cmd->execute(array(':id' => $id));
 
@@ -15,6 +16,9 @@ class Match
 
         if ($match == null || $match['date'] == null)
             throw new ApiException("there is no match with ID '$id'");
+
+        $match['goals'] = intval($match['goals']);
+        $match['homegame'] = $match['homegame'] > 0 ? true : false;
 
         return $match;
     }
