@@ -92,28 +92,62 @@ class Match
             throw new ApiException('there is no opponent '.$match->opponent);
     }
 
+    private static function setDefaultValues($match)
+    {
+        $match->tournament = isset($match->tournament)
+            ? $match->tournament : 1;
+
+        $match->homegame = isset($match->homegame)
+            ? $match->homegame : true;
+
+        $match->opponentGoals = isset($match->opponentGoals)
+            ? $match->opponentGoals : 0;
+    }
+
     public static function add($db, $match)
     {
         Match::validate($db, $match);
 
-        $opponent = $match->opponent;
-        $date = $match->date;
-
-        $tournament = isset($match->tournament) ? $match->tournament : 1;
-        $homegame = isset($match->homegame) ? $match->homegame : true;
-        $goals = isset($match->opponentGoals) ? $match->opponentGoals : 0;
+        Match::setDefaultValues($match);
 
         $cmd = $db->prepare('INSERT INTO matches '.
             '(opponent,tournament,homegame,date,opponent_goals) '.
             'VALUES (:op,:tour,:hg,:d,:og);');
 
-        $cmd->execute(array(':op' => $opponent,
-            ':tour' => $tournament,
-            ':hg' => $homegame,
-            ':d' => $date,
-            ':og' => $goals));
+        $cmd->execute(array(':op' => $match->opponent,
+            ':tour' => $match->tournament,
+            ':hg' => $match->homegame,
+            ':d' => $match->date,
+            ':og' => $match->opponentGoals));
 
         return $db->lastInsertId();
+    }
+
+    public static function update($db, $match)
+    {
+        Match::validate($db, $match);
+
+        if (!isset($match->id) || $match->id < 1)
+            throw new ApiException('no or invalid match ID given');
+
+        Match::setDefaultValues($match);
+
+        $cmd = $db->prepare('UPDATE matches SET '.
+            'opponent=:op,'.
+            'tournament=:tour,'.
+            'homegame=:hg,'.
+            'date=:d,'.
+            'opponent_goals=:og '.
+            'WHERE id=:id;');
+
+        $cmd->execute(array(':op' => $match->opponent,
+            ':tour' => $match->tournament,
+            ':hg' => $match->homegame,
+            ':d' => $match->date,
+            ':og' => $match->opponentGoals,
+            ':id' => $match->id));
+
+        return $cmd->rowCount() > 0;
     }
 }
 
@@ -162,6 +196,21 @@ class MatchController
         $data->id = $id;
 
         return $data;
+    }
+
+    /**
+     * Update an existing match
+     *
+     * @url PUT /match
+     */
+    public function updateMatch($data)
+    {
+        if ($data === null)
+            throw new ApiException('no or invalid match object given');
+
+        $success = Match::update($this->database, $data);
+
+        return $success;
     }
 }
 
