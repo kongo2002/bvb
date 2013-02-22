@@ -6,7 +6,7 @@ class Match
     {
         # get match information
         $cmd = $db->prepare('SELECT date,teams.name,sum(matchevents.goals) as goals,'.
-            'opponent_goals,homegame FROM matches '.
+            'opponent_goals as opponentGoals,homegame FROM matches '.
             'INNER JOIN teams ON teams.id=opponent '.
             'INNER JOIN matchevents ON matchevents.match=matches.id '.
             'WHERE matches.id = :id;');
@@ -71,6 +71,50 @@ class Match
 
         return array($starters, $subs);
     }
+
+    private static function opponentExists($db, $opponentId)
+    {
+        $cmd = $db->prepare('SELECT COUNT(id) FROM teams WHERE id=:id;');
+        $cmd->execute(array(':id' => $opponentId));
+
+        return $cmd->fetchColumn() > 0;
+    }
+
+    private static function validate($db, $match)
+    {
+        if (!isset($match->opponent) || $match->opponent < 1)
+            throw new ApiException('no or invalid opponent given');
+
+        if (!isset($match->date))
+            throw new ApiException('no date given');
+
+        if (!Match::opponentExists($db, $match->opponent))
+            throw new ApiException('there is no opponent '.$match->opponent);
+    }
+
+    public static function add($db, $match)
+    {
+        Match::validate($db, $match);
+
+        $opponent = $match->opponent;
+        $date = $match->date;
+
+        $tournament = isset($match->tournament) ? $match->tournament : 1;
+        $homegame = isset($match->homegame) ? $match->homegame : true;
+        $goals = isset($match->opponentGoals) ? $match->opponentGoals : 0;
+
+        $cmd = $db->prepare('INSERT INTO matches '.
+            '(opponent,tournament,homegame,date,opponent_goals) '.
+            'VALUES (:op,:tour,:hg,:d,:og);');
+
+        $cmd->execute(array(':op' => $opponent,
+            ':tour' => $tournament,
+            ':hg' => $homegame,
+            ':d' => $date,
+            ':og' => $goals));
+
+        return $db->lastInsertId();
+    }
 }
 
 class MatchController
@@ -102,6 +146,22 @@ class MatchController
     public function getMatchList()
     {
         return Match::getList($this->database);
+    }
+
+    /**
+     * Add a new match to the database
+     *
+     * @url POST /match
+     */
+    public function addMatch($data)
+    {
+        if ($data === null)
+            throw new ApiException('no or invalid match object given');
+
+        $id = Match::add($this->database, $data);
+        $data->id = $id;
+
+        return $data;
     }
 }
 
