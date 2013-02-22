@@ -149,6 +149,17 @@ class Match
 
         return $cmd->rowCount() > 0;
     }
+
+    public static function delete($db, $id)
+    {
+        if ($id < 1)
+            throw new ApiException('no or invalid ID given');
+
+        $cmd = $db->prepare('DELETE FROM matches WHERE id=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        return $cmd->rowCount() > 0;
+    }
 }
 
 class MatchController
@@ -209,6 +220,18 @@ class MatchController
             throw new ApiException('no or invalid match object given');
 
         $success = Match::update($this->database, $data);
+
+        return $success;
+    }
+
+    /**
+     * Delete an existing match
+     *
+     * @url DELETE /match/$id
+     */
+    public function deleteMatch($id)
+    {
+        $success = Match::delete($this->database, $id);
 
         return $success;
     }
