@@ -2,6 +2,8 @@
 
 class Match
 {
+    private static $teamName = 'Borussia Dortmund';
+
     public static function get($db, $id)
     {
         # get match information
@@ -28,16 +30,25 @@ class Match
 
     public static function getList($db)
     {
-        $cmd = $db->query('SELECT matches.id,name,date,homegame FROM matches '.
+        # TODO: paging
+        $cmd = $db->query('SELECT matches.id,name,date,homegame,opponent_goals,sum(matchevents.goals) '.
+            'FROM matches '.
             'INNER JOIN teams ON teams.id=matches.opponent '.
+            'INNER JOIN matchevents ON matchevents.match=matches.id '.
             'ORDER BY date ASC;');
 
         $func = function($m)
         {
-            return array('id' => $m[0],
-                'opponent' => $m[1],
-                'date' => $m[2],
-                'homegame' => $m[3] > 0 ? true : false);
+            list($id, $opponent, $date, $hg, $og, $goals) = $m;
+
+            $homegame = $hg > 0 ? true : false;
+            $result = $homegame ? ($goals.':'.$og) : ($og.':'.$goals);
+
+            return array('id' => $id,
+                'opponent' => $opponent,
+                'date' => $date,
+                'homegame' => $homegame,
+                'result' => $result);
         };
 
         return array_map($func, $cmd->fetchAll(PDO::FETCH_NUM));
