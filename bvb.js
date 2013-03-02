@@ -948,6 +948,48 @@ function BVB() {
         Götze : { assists : 1, boni : [Bonus.TOTD] }
         },
         [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Leitner', 'Bender' /*, 'Sahin' */ ], true);
+
+    addMatch(Helpers.day(2013, 2, 3), 'Bayer Leverkusen', 3, 2, {
+        Blaszczykowski : { goals : 1 },
+        Reus : { goals : 1 },
+        Lewandowski : { goals : 1, assists : 2 },
+        Götze : { assists : 1 }
+        },
+        [ 'Langerak', 'Piszczek', 'Santana', 'Hummels', 'Gündogan', 'Schmelzer', 'Bender', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Grosskreutz', 'Kehl', 'Schieber' ]);
+
+    addMatch(Helpers.day(2013, 2, 9), 'Hamburger SV', 1, 4, {
+        Lewandowski : { goals : 1, red : 1 },
+        Hummels : { assists : 1 },
+        Götze : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Kehl', /* Sahin, */ 'Bender', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Gündogan', 'Schieber' ], true);
+
+    addMatch(Helpers.day(2013, 2, 13), 'Schachtar Donezk', 2, 2, {
+        Lewandowski : { goals : 1 },
+        Hummels : { goals : 1 },
+        Götze : { assists : 1 },
+        Schmelzer : { assists : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Santana', 'Hummels', 'Kehl', 'Schmelzer', 'Bender', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Leitner', 'Schieber' ], false, 'CL16');
+
+    addMatch(Helpers.day(2013, 2, 16), 'Eintracht Frankfurt', 3, 0, {
+        Reus : { goals : 3 },
+        Hummels : { assists : 1 },
+        Götze : { assists : 2 },
+        Schieber : { yellow : 2 },
+        Hummels : { yellow : 1 },
+        Subotic : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Schmelzer', 'Bender', 'Blaszczykowski', 'Schieber', 'Reus', 'Götze'], [ 'Grosskreutz', 'Leitner' /*, 'Sahin' */ ], true);
+
+    addMatch(Helpers.day(2013, 2, 24), 'Borussia Mönchengladbach', 1, 1, {
+        Götze : { goals : 1, assists : 1 },
+        Santana : { yellow : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Hummels', 'Gündogan', 'Schmelzer', 'Kehl', 'Grosskreutz', 'Leitner', 'Reus', 'Götze'], [ 'Santana' /*, 'Bajner', 'Sahin' */ ]);
+
+    addMatch(Helpers.day(2013, 2, 27), 'Bayern München', 0, 1, { },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Santana', 'Gündogan', 'Schmelzer', 'Bender', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Schieber', 'Blaszczykowski' ], false, 'Pokal');
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
