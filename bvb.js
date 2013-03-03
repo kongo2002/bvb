@@ -149,6 +149,10 @@ Match.fromDto = function(dto) {
         m.substitutePlayers($.map(dto.substitutes, function(x) { return x.id; }));
     }
 
+    if (dto.goals) {
+        m.goals($.map(dto.goals, function(x) { return new Goal(x.id); }));
+    }
+
     console.debug(m);
 
     return m;

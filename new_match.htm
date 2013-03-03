@@ -92,7 +92,7 @@
           <div class="controls">
             <ul data-bind="foreach: goals" class="unstyled">
               <li>
-                <select data-bind="options: $parent.goalCandidates, optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
+                <select data-bind="options: $root.players, optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
                 <a data-bind="click: $parent.removeGoal"><i class="icon-remove"></i></a>
               </li>
             </ul>
