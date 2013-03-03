@@ -5,9 +5,10 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>Borussia Dortmund score board</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="flot/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="bvb.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="knockout.js" type="text/javascript" charset="utf-8"></script>
+  <script src="bvb.js" type="text/javascript" charset="utf-8"></script>
   <link rel="stylesheet" href="bvb.css" type="text/css" media="screen" charset="utf-8" />
+
 </head>
 <body>
   <div id="meta">
@@ -15,14 +16,32 @@
       <h1>Borussia Dortmund score board</h1>
     </div>
     <div class="content">
-      <div id="scores"></div>
+      <div id="scores">
+      <h2>Scores</h2>
+        <table>
+          <thead>
+            <tr>
+              <td>Date</td>
+              <td>Match</td>
+              <td>Result</td>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: matches">
+            <tr>
+              <td data-bind="text: date"></td>
+              <td data-bind="text: name"></td>
+              <td data-bind="text: result"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="footer">
       <noscript>
         Enabled JavaScript is required to see any content on this page.
       </noscript>
       <div class="copyright">
-        Copyright © 2012 Gregor Uhlenheuer
+        Copyright © 2012-2013 Gregor Uhlenheuer
       </div>
     </div>
   </div>
