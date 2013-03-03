@@ -21,6 +21,8 @@ class Match
         if ($match == null || $match['date'] == null)
             throw new ApiException("there is no match with ID '$id'");
 
+        $match['id'] = $id;
+
         # correct goals/homegame data types
         $match['goals'] = intval($match['goals']);
         $match['homegame'] = $match['homegame'] > 0 ? true : false;
@@ -34,7 +36,8 @@ class Match
         $cmd = $db->query('SELECT matches.id,name,date,homegame,opponent_goals,sum(matchevents.goals) '.
             'FROM matches '.
             'INNER JOIN teams ON teams.id=matches.opponent '.
-            'INNER JOIN matchevents ON matchevents.match=matches.id '.
+            'LEFT OUTER JOIN matchevents ON matchevents.match=matches.id '.
+            'GROUP BY matches.id '.
             'ORDER BY date ASC;');
 
         $func = function($m)
@@ -42,6 +45,7 @@ class Match
             list($id, $opponent, $date, $hg, $og, $goals) = $m;
 
             $homegame = $hg > 0 ? true : false;
+            $goals = $goals === null ? 0 : $goals;
             $result = $homegame ? ($goals.':'.$og) : ($og.':'.$goals);
 
             return array('id' => $id,
@@ -52,6 +56,41 @@ class Match
         };
 
         return array_map($func, $cmd->fetchAll(PDO::FETCH_NUM));
+    }
+
+    public static function getMatchEvents($db, $id)
+    {
+        # get match events
+        $cmd = $db->prepare('SELECT sum(goals) as goals,'.
+            'sum(owngoals) as owngoals,'.
+            'sum(assists) as assists,player,firstname,lastname '.
+            'FROM matchevents '.
+            'INNER JOIN players ON players.id=player '.
+            'WHERE matchevents.match=:id '.
+            'GROUP BY player;');
+
+        $cmd->execute(array(':id' => $id));
+
+        $goals = array();
+        $assists = array();
+        $owngoals = array();
+
+        foreach ($cmd->fetchAll(PDO::FETCH_ASSOC) as $event)
+        {
+            $elem = array('id' => $event['player'],
+                'name' => $event['firstname'].' '.$event['lastname']);
+
+            if ($event['goals'] > 0)
+                $goals[] = $elem;
+
+            if ($event['assists'] > 0)
+                $assists[] = $elem;
+
+            if ($event['owngoals'] > 0)
+                $owngoals[] = $elem;
+        }
+
+        return array($goals, $assists, $owngoals);
     }
 
     public static function getMatchPlayers($db, $id)
@@ -187,9 +226,13 @@ class MatchController
         $match = Match::get($db, $id);
 
         list($starters, $subs) = Match::getMatchPlayers($db, $id);
+        list($goals, $assists) = Match::getMatchEvents($db, $id);
 
         $match['starters'] = $starters;
         $match['substitutes'] = $subs;
+
+        $match['goals'] = $goals;
+        $match['assists'] = $assists;
 
         return $match;
     }
