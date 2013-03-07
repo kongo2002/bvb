@@ -990,6 +990,23 @@ function BVB() {
 
     addMatch(Helpers.day(2013, 2, 27), 'Bayern München', 0, 1, { },
         [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Santana', 'Gündogan', 'Schmelzer', 'Bender', 'Grosskreutz', 'Lewandowski', 'Reus', 'Götze'], [ 'Schieber', 'Blaszczykowski' ], false, 'Pokal');
+
+    addMatch(Helpers.day(2013, 3, 2), 'Hannover 96', 3, 1, {
+        Lewandowski : { goals : 2 },
+        Grosskreutz : { assists : 2 },
+        Blaszczykowski : { assists : 1 },
+        Schieber : { goals : 1 }
+        },
+        [ 'Weidenfeller', 'Grosskreutz', 'Subotic', 'Santana', 'Gündogan', 'Schmelzer', 'Kehl', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Schieber'], [ 'Götze', 'Bender' /*, 'Sahin' */ ], true);
+
+    addMatch(Helpers.day(2013, 3, 5), 'Schachtar Donezk', 3, 0, {
+        Lewandowski : { assists : 1 },
+        Blaszczykowski : { goals : 1 },
+        Götze : { goals : 1, assists : 1 },
+        Gündogan : { assists : 1 },
+        Santana : { goals : 1 }
+        },
+        [ 'Weidenfeller', 'Piszczek', 'Subotic', 'Santana', 'Gündogan', 'Schmelzer', 'Bender', 'Blaszczykowski', 'Lewandowski', 'Reus', 'Götze'], [ 'Kehl', 'Grosskreutz' /*, 'Sahin' */ ], true, 'CL16');
 }
 
 BVB.prototype.activatePlayer = function(scores, id, elem) {
