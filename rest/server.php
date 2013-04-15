@@ -49,6 +49,11 @@ class RestServer
         $this->realm = $realm;
         $dir = dirname(str_replace($_SERVER['DOCUMENT_ROOT'], '', $_SERVER['SCRIPT_FILENAME']));
         $this->root = ($dir == '.' ? '' : $dir . '/');
+
+        # strip leading slash
+        $len = strlen($this->root);
+        if ($len > 0 && $this->root[0] == '/')
+            $this->root = substr($this->root, 1);
     }
 
     public function  __destruct()
@@ -163,7 +168,7 @@ class RestServer
             elseif (!is_string($class) && !is_object($class))
                 throw new Exception('Invalid method or class; must be a classname or object');
 
-            if (substr($basePath, 0, 1) == '/')
+            if ($basePath != '/' && substr($basePath, 0, 1) == '/')
                 $basePath = substr($basePath, 1);
 
             if ($basePath && substr($basePath, -1) != '/')
@@ -349,12 +354,12 @@ class RestServer
     {
         $path = substr(preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']), 1);
 
-        if ($path[strlen($path) - 1] == '/')
-            $path = substr($path, 0, -1);
-
         # remove root from path
         if ($this->root)
             $path = str_replace($this->root, '', $path);
+
+        if ($path && $path[strlen($path) - 1] == '/')
+            $path = substr($path, 0, -1);
 
         return $path;
     }
