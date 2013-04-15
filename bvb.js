@@ -100,6 +100,16 @@ function Match(bvb) {
         return bvb.getPlayers(candidates);
     });
 
+    this.substitutionCandidates = ko.computed(function() {
+        var candidates = [];
+        var starters = self.startingPlayers();
+        $.each(bvb.players(), function(_, p) {
+            if (!Utils.contains(starters, p.id))
+                candidates.push(p);
+        });
+        return candidates;
+    });
+
     this.computedGoals = ko.computed(function() {
         return self.goals().filter(function(g) {
             return g.player() > 0;

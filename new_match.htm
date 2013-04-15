@@ -73,7 +73,7 @@
         <div class="control-group">
           <label class="control-label" for="inputSubstitutePlayers">Substituted players:</label>
           <div class="controls">
-            <select data-bind="options: $root.players, optionsText: 'name', optionsValue: 'id', selectedOptions: substitutePlayers"
+            <select data-bind="options: substitutionCandidates, optionsText: 'name', optionsValue: 'id', selectedOptions: substitutePlayers"
               multiple="multiple" id="inputSubstitutePlayers" size="4"></select>
           </div>
         </div>
