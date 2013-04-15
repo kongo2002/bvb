@@ -66,6 +66,13 @@ var Utils = {
                 callback.call(context);
             }
         };
+    },
+    pluck : function(array, property) {
+        var newArray = [], len = array.length;
+        for (var i=0; i<len; i++) {
+            newArray[i] = array[i][property];
+        }
+        return newArray;
     }
 }
 
@@ -154,11 +161,11 @@ Match.fromDto = function(dto) {
     m.date(dto.date);
 
     if (dto.starters) {
-        m.startingPlayers($.map(dto.starters, function(x) { return x.id; }));
+        m.startingPlayers(Utils.pluck(dto.starters, 'id'));
     }
 
     if (dto.substitutes) {
-        m.substitutePlayers($.map(dto.substitutes, function(x) { return x.id; }));
+        m.substitutePlayers(Utils.pluck(dto.substitutes, 'id'));
     }
 
     if (dto.goals) {
