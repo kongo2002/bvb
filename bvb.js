@@ -188,6 +188,8 @@ function Admin() {
 function BVB() {
     this.matches = ko.observableArray();
     this.players = ko.observableArray();
+    this.teams = ko.observableArray();
+
     this.admin = ko.observable(new Admin());
 };
 
@@ -201,6 +203,20 @@ BVB.prototype.getPlayers = function(callback) {
         /* invoke callback if given */
         if (callback) {
             callback.call(self, ps);
+        }
+    });
+};
+
+BVB.prototype.getTeams = function(callback) {
+    var self = this;
+
+    Utils.call('teams', function(ts) {
+        self.teams.removeAll();
+        $.each(ts, function(_, t) { self.teams.push(t); });
+
+        /* invoke callback if given */
+        if (callback) {
+            callback.call(self, ts);
         }
     });
 };
@@ -232,11 +248,12 @@ BVB.prototype.getMatches = function(callback) {
 };
 
 BVB.prototype.init = function(callback) {
-    var chain = Utils.chainer(2, callback, this);
+    var chain = Utils.chainer(3, callback, this);
 
     this.getPlayers(chain);
     this.getMatches(chain);
-}
+    this.getTeams(chain);
+};
 
 $(function() {
     /* initialize */
