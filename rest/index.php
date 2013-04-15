@@ -19,10 +19,10 @@ $server = new RestServer($mode);
 // uncomment to clear the cache in production mode
 $server->refreshCache();
 
-$server->addClass('BaseController', '/bvb/rest');
-$server->addClass('UserController', '/bvb/rest/users');
-$server->addClass('PlayerController', '/bvb/rest/players');
-$server->addClass('MatchController', '/bvb/rest/matches');
+$server->addClass('BaseController', '/bvb_new/rest');
+$server->addClass('UserController', '/bvb_new/rest/users');
+$server->addClass('PlayerController', '/bvb_new/rest/players');
+$server->addClass('MatchController', '/bvb_new/rest/matches');
 
 $server->handle();
 
