@@ -54,6 +54,18 @@ var Utils = {
                 return true;
         }
         return false;
+    },
+    chainer : function(numCallbacks, callback, context) {
+        var finished = 0;
+        return function() {
+            finished += 1;
+            console.debug('chainer called ('+finished+'/'+numCallbacks+')');
+
+            if (callback && finished >= numCallbacks) {
+                console.log('chainer finished');
+                callback.call(context);
+            }
+        };
     }
 }
 
@@ -179,16 +191,21 @@ function BVB() {
     this.admin = ko.observable(new Admin());
 };
 
-BVB.prototype.getPlayers = function() {
+BVB.prototype.getPlayers = function(callback) {
     var self = this;
 
     Utils.call('players', function(ps) {
         self.players.removeAll();
         $.each(ps, function(_, p) { self.players.push(p); });
+
+        /* invoke callback if given */
+        if (callback) {
+            callback.call(self, ps);
+        }
     });
 };
 
-BVB.prototype.getMatches = function() {
+BVB.prototype.getMatches = function(callback) {
     var self = this;
     var team = 'Borussia Dortmund';
 
@@ -206,8 +223,20 @@ BVB.prototype.getMatches = function() {
     Utils.call('matches', function(ms) {
         self.matches.removeAll();
         $.each(ms, function(_, m) { self.matches.push(match(m)); });
+
+        /* invoke callback if given */
+        if (callback) {
+            callback.call(self, ms);
+        }
     });
 };
+
+BVB.prototype.init = function(callback) {
+    var chain = Utils.chainer(2, callback, this);
+
+    this.getPlayers(chain);
+    this.getMatches(chain);
+}
 
 $(function() {
     /* initialize */
@@ -225,17 +254,13 @@ $(function() {
     /* initialize BVB instance */
     var bvb = new BVB();
 
-    /* load a list of recent matches */
-    bvb.getMatches();
+    bvb.init(function() {
+        /* apply knockout MVVM bindings after BVB was initialized */
+        ko.applyBindings(bvb);
 
-    /* load the list of players */
-    bvb.getPlayers();
-
-    /* apply knockout MVVM bindings */
-    ko.applyBindings(bvb);
-
-    /* hook into datepickers */
-    $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd'
+        /* hook into datepickers */
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
     });
 });
