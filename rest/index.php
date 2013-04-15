@@ -15,7 +15,7 @@ spl_autoload_register();
 
 // 'debug' or 'production'
 $mode = 'debug';
-$server = new RestServer($mode);
+$server = new RestServer($mode, 'BVB_REST');
 
 // uncomment to clear the cache in production mode
 $server->refreshCache();

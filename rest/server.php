@@ -43,7 +43,7 @@ class RestServer
      * @param string $mode  The mode, either debug or production
      * @param string $realm The server's realm
      */
-    public function  __construct($mode = 'debug', $realm = 'Rest Server')
+    public function  __construct($mode = 'debug', $realm = 'REST')
     {
         $this->mode = $mode;
         $this->realm = $realm;
