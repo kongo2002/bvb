@@ -59,10 +59,7 @@ var Utils = {
         var finished = 0;
         return function() {
             finished += 1;
-            console.debug('chainer called ('+finished+'/'+numCallbacks+')');
-
             if (callback && finished >= numCallbacks) {
-                console.log('chainer finished');
                 callback.call(context);
             }
         };
@@ -80,10 +77,11 @@ function Goal(playerId) {
     this.player = ko.observable(playerId || 0);
 }
 
-function Match() {
+function Match(bvb) {
     var self = this;
     var now = Utils.toDateString(new Date());
 
+    this.bvb = bvb;
     this.id = ko.observable(0);
     this.date = ko.observable(now);
     this.opponent = ko.observable('');
@@ -100,7 +98,7 @@ function Match() {
             if (!Utils.contains(candidates, p))
                 candidates.push(p);
         });
-        return candidates;
+        return bvb.getPlayers(candidates);
     });
 
     this.computedGoals = ko.computed(function() {
@@ -151,8 +149,8 @@ function Match() {
     }
 }
 
-Match.fromDto = function(dto) {
-    var m = new Match();
+Match.fromDto = function(dto, bvb) {
+    var m = new Match(bvb);
 
     m.id(dto.id);
     m.homegame(dto.homegame);
@@ -172,23 +170,22 @@ Match.fromDto = function(dto) {
         m.goals($.map(dto.goals, function(x) { return new Goal(x.id); }));
     }
 
-    console.debug(m);
-
     return m;
 }
 
-function Admin() {
+function Admin(bvb) {
     var self = this;
+    this.bvb = bvb;
     this.selectedMatch = ko.observable();
-    this.match = ko.observable(new Match());
+    this.match = ko.observable(new Match(bvb));
 
     this.selectedMatch.subscribe(function (selection) {
         if (selection && selection.id) {
             Utils.call('matches/match/'+selection.id, function(m) {
-                self.match(Match.fromDto(m));
+                self.match(Match.fromDto(m, bvb));
             });
         } else
-            self.match(new Match());
+            self.match(new Match(bvb));
     });
 }
 
@@ -196,11 +193,9 @@ function BVB() {
     this.matches = ko.observableArray();
     this.players = ko.observableArray();
     this.teams = ko.observableArray();
-
-    this.admin = ko.observable(new Admin());
 };
 
-BVB.prototype.getPlayers = function(callback) {
+BVB.prototype.loadPlayers = function(callback) {
     var self = this;
 
     Utils.call('players', function(ps) {
@@ -214,7 +209,7 @@ BVB.prototype.getPlayers = function(callback) {
     });
 };
 
-BVB.prototype.getTeams = function(callback) {
+BVB.prototype.loadTeams = function(callback) {
     var self = this;
 
     Utils.call('teams', function(ts) {
@@ -228,7 +223,7 @@ BVB.prototype.getTeams = function(callback) {
     });
 };
 
-BVB.prototype.getMatches = function(callback) {
+BVB.prototype.loadMatches = function(callback) {
     var self = this;
     var team = 'Borussia Dortmund';
 
@@ -254,12 +249,33 @@ BVB.prototype.getMatches = function(callback) {
     });
 };
 
+BVB.prototype.getPlayer = function(id) {
+    var players = this.players();
+    var len = players.length;
+    for (var i=0; i<len; i++) {
+        var player = players[i];
+        if (player.id == id)
+            return player;
+    }
+    return null;
+};
+
+BVB.prototype.getPlayers = function(playerIds) {
+    var players = [], len = playerIds.length;
+    for (var i=0; i<len; i++) {
+        var player = this.getPlayer(playerIds[i]);
+        if (player != null)
+            players.push(player);
+    }
+    return players;
+};
+
 BVB.prototype.init = function(callback) {
     var chain = Utils.chainer(3, callback, this);
 
-    this.getPlayers(chain);
-    this.getMatches(chain);
-    this.getTeams(chain);
+    this.loadPlayers(chain);
+    this.loadMatches(chain);
+    this.loadTeams(chain);
 };
 
 $(function() {
@@ -279,6 +295,9 @@ $(function() {
     var bvb = new BVB();
 
     bvb.init(function() {
+        /* initialize admin */
+        bvb.admin = new ko.observable(new Admin(bvb));
+
         /* apply knockout MVVM bindings after BVB was initialized */
         ko.applyBindings(bvb);
 
