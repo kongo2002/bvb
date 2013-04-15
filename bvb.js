@@ -139,6 +139,11 @@ function Match(bvb) {
         console.debug(goals.length);
     }
 
+    this.remove = function() {
+        /* TODO */
+        console.debug(self.id());
+    }
+
     this.addGoal = function() {
         self.goals.push(new Goal());
     }
