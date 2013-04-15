@@ -81,7 +81,6 @@ function Match(bvb) {
     var self = this;
     var now = Utils.toDateString(new Date());
 
-    this.bvb = bvb;
     this.id = ko.observable(0);
     this.date = ko.observable(now);
     this.opponent = ko.observable('');
@@ -175,7 +174,6 @@ Match.fromDto = function(dto, bvb) {
 
 function Admin(bvb) {
     var self = this;
-    this.bvb = bvb;
     this.selectedMatch = ko.observable();
     this.match = ko.observable(new Match(bvb));
 
@@ -279,9 +277,6 @@ BVB.prototype.init = function(callback) {
 };
 
 $(function() {
-    /* initialize */
-    console.debug('initializing bvb.js');
-
     /* global AJAX setup */
     $.ajaxSetup({
         url: 'index.php',
