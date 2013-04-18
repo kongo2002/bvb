@@ -8,6 +8,7 @@ class Match
     {
         # get match information
         $cmd = $db->prepare('SELECT date,teams.name,sum(matchevents.goals) as goals,'.
+            'teams.id as opponent,'.
             'opponent_goals as opponentGoals,homegame FROM matches '.
             'INNER JOIN teams ON teams.id=opponent '.
             'INNER JOIN matchevents ON matchevents.match=matches.id '.

@@ -50,7 +50,7 @@
       <div class="control-group">
         <label class="control-label" for="inputOpponent">Opponent:</label>
         <div class="controls">
-          <input data-bind="value: opponent" type="text" id="inputOpponent" class="span4" placeholder="Opponent" required/>
+          <select data-bind="options: $root.teams, optionsText: 'name', optionsValue: 'id', value: opponent, optionsCaption: 'Select...'"></select>
         </div>
       </div>
 

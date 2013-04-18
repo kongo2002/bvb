@@ -86,7 +86,8 @@ function Match(bvb) {
 
     this.id = ko.observable(0);
     this.date = ko.observable(new Date());
-    this.opponent = ko.observable('');
+    this.name = ko.observable('');
+    this.opponent = ko.observable(0);
     this.opponentGoals = ko.observable(0);
     this.homegame = ko.observable(true);
     this.goals = ko.observableArray();
@@ -157,19 +158,17 @@ function Match(bvb) {
         if (self.isNewMatch())
             return '';
         if (self.homegame()) {
-            return team + ' : ' + self.opponent() + ' - ' +
+            return team + ' : ' + self.name() + ' - ' +
                 self.computedGoals() + ' : ' + self.opponentGoals();
         } else {
-            return self.opponent() + ' : ' + team + ' - ' +
+            return self.name() + ' : ' + team + ' - ' +
                 self.opponentGoals() + ' : ' + self.computedGoals();
         }
     });
 
     this.save = function() {
         /* TODO */
-        var goals = self.goals();
-        console.debug(goals);
-        console.debug(goals.length);
+        console.debug(self.date());
     }
 
     this.remove = function() {
@@ -199,7 +198,8 @@ Match.fromDto = function(dto, bvb) {
 
     m.id(dto.id);
     m.homegame(dto.homegame);
-    m.opponent(dto.name);
+    m.name(dto.name);
+    m.opponent(dto.opponent);
     m.opponentGoals(dto.opponentGoals);
     m.date(dto.date);
 
