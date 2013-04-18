@@ -77,6 +77,10 @@ function Goal(playerId) {
     this.player = ko.observable(playerId || 0);
 }
 
+function Assist(playerId) {
+    this.player = ko.observable(playerId || 0);
+}
+
 function Match(bvb) {
     var self = this;
     var now = Utils.toDateString(new Date());
@@ -87,6 +91,7 @@ function Match(bvb) {
     this.opponentGoals = ko.observable(0);
     this.homegame = ko.observable(true);
     this.goals = ko.observableArray();
+    this.assists = ko.observableArray();
     this.startingPlayers = ko.observableArray();
     this.substitutePlayers = ko.observableArray();
 
@@ -113,6 +118,12 @@ function Match(bvb) {
     this.computedGoals = ko.computed(function() {
         return self.goals().filter(function(g) {
             return g.player() > 0;
+        }).length;
+    });
+
+    this.computedAssists = ko.computed(function() {
+        return self.assists().filter(function(a) {
+            return a.player() > 0;
         }).length;
     });
 
@@ -158,8 +169,16 @@ function Match(bvb) {
         self.goals.push(new Goal());
     }
 
+    this.addAssist = function() {
+        self.assists.push(new Assist());
+    }
+
     this.removeGoal = function(goal) {
         self.goals.remove(goal);
+    }
+
+    this.removeAssist = function(assist) {
+        self.assists.remove(assist);
     }
 }
 
@@ -182,6 +201,10 @@ Match.fromDto = function(dto, bvb) {
 
     if (dto.goals) {
         m.goals($.map(dto.goals, function(x) { return new Goal(x.id); }));
+    }
+
+    if (dto.assists) {
+        m.assists($.map(dto.assists, function(x) { return new Assist(x.id); }));
     }
 
     return m;

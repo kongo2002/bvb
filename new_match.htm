@@ -77,6 +77,8 @@
               multiple="multiple" id="inputSubstitutePlayers" size="4"></select>
           </div>
         </div>
+
+        <!-- add new goal -->
         <div class="control-group">
           <label class="control-label">Goals:</label>
           <div class="controls">
@@ -88,6 +90,8 @@
             </div>
           </div>
         </div>
+
+        <!-- goals -->
         <div class="control-group">
           <div class="controls">
             <ul data-bind="foreach: goals" class="unstyled">
@@ -98,12 +102,41 @@
             </ul>
           </div>
         </div>
+
+        <!-- add new assist -->
+        <div class="control-group">
+          <label class="control-label">Assists:</label>
+          <div class="controls">
+            <div class="input-append">
+              <span data-bind="text: computedAssists()" class="span1 uneditable-input"></span>
+              <button data-bind="click: addAssist" type="button" class="btn">
+                <i class="icon-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- assists -->
+        <div class="control-group">
+          <div class="controls">
+            <ul data-bind="foreach: assists" class="unstyled">
+              <li>
+                <select data-bind="options: $parent.goalCandidates(), optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
+                <a data-bind="click: $parent.removeAssist"><i class="icon-remove"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- buttons -->
         <div class="control-group">
           <div class="controls">
             <button data-bind="click: save, text: actionName, enable: isValid()" type="submit" class="btn btn-primary"></button>
             <button data-bind="enable: !isNewMatch()" data-target="#modal-delete" data-toggle="modal" type="submit" class="btn btn-danger">Delete</button>
           </div>
         </div>
+
+        <!-- modal delete dialog -->
         <div id="modal-delete" class="modal hide fade" role="dialog">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
@@ -115,6 +148,7 @@
             <button class="btn" data-dismiss="modal">No, better not</button>
           </div>
         </div>
+
     </form>
 
     <div class="footer">
