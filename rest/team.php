@@ -17,6 +17,28 @@ class Team
         return $team;
     }
 
+    public static function exists($db, $teamName)
+    {
+        if (!$teamName)
+            throw new ApiException('invalid team name given');
+
+        $cmd = $db->prepare('SELECT count(id) FROM teams WHERE name = :name;');
+        $cmd->execute(array(':name' => $teamName));
+
+        return $cmd->fetchColumn() > 0;
+    }
+
+    public static function add($db, $team)
+    {
+        if (!$teamName)
+            throw new ApiException('invalid team name given');
+
+        $cmd = $db->prepare('INSERT INTO teams (name) VALUES (:name);');
+        $cmd->execute(array(':name' => $team));
+
+        return $db->lastInsertId();
+    }
+
     public static function getList($db)
     {
         $cmd = $db->query('SELECT id,name FROM teams ORDER BY name ASC;');
