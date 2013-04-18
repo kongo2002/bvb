@@ -24,131 +24,149 @@
     <h2>Add/edit match</h2>
 
     <form class="form-horizontal" data-bind="with: match">
-        <div class="control-group">
-          <label class="control-label">ID:</label>
-          <div class="controls controls-row">
-            <span data-bind="text: id" class="span1 uneditable-input"></span>
-            <select class="span3" data-bind="options: $root.matches, optionsText: 'showName', value: $parent.selectedMatch, optionsCaption: 'New...'">
-            </select>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputDate">Date:</label>
-          <div class="controls">
-            <input data-bind="value: date" type="text" id="inputDate" class="span4 datepicker" placeholder="Date" required/>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputOpponent">Opponent:</label>
-          <div class="controls">
-            <input data-bind="value: opponent" type="text" id="inputOpponent" class="span4" placeholder="Opponent" required/>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputHomegame">Homegame:</label>
-          <div class="controls">
-            <input data-bind="checked: homegame" type="checkbox" id="inputHomegame" />
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputAgainst">Against goals:</label>
-          <div class="controls">
-            <input data-bind="value: opponentGoals" type="text" id="inputAgainst" class="span1"/>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label">Players:</label>
-          <div class="controls controls-row">
-            <span data-bind="text: numPlayers()" class="span1 uneditable-input"></span>
-            <span data-bind="text: numSubstitutes()" class="span1 uneditable-input"></span>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputStartingPlayers">Starting players:</label>
-          <div class="controls">
-            <select data-bind="options: $root.players, optionsText: 'name', optionsValue: 'id', selectedOptions: startingPlayers"
-              multiple="multiple" id="inputStartingPlayers" size="11"></select>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputSubstitutePlayers">Substituted players:</label>
-          <div class="controls">
-            <select data-bind="options: substitutionCandidates, optionsText: 'name', optionsValue: 'id', selectedOptions: substitutePlayers"
-              multiple="multiple" id="inputSubstitutePlayers" size="4"></select>
-          </div>
-        </div>
 
-        <!-- add new goal -->
-        <div class="control-group">
-          <label class="control-label">Goals:</label>
-          <div class="controls">
-            <div class="input-append">
-              <span data-bind="text: computedGoals()" class="span1 uneditable-input"></span>
-              <button data-bind="click: addGoal" type="button" class="btn">
-                <i class="icon-plus"></i>
-              </button>
-            </div>
+      <!-- match name -->
+      <h3 data-bind="text: matchName()"></h3>
+
+      <!-- match selector -->
+      <div class="control-group">
+        <label class="control-label">ID:</label>
+        <div class="controls controls-row">
+          <span data-bind="text: id" class="span1 uneditable-input"></span>
+          <select class="span3" data-bind="options: $root.matches, optionsText: 'showName', value: $parent.selectedMatch, optionsCaption: 'New...'">
+          </select>
+        </div>
+      </div>
+
+      <!-- match date -->
+      <div class="control-group">
+        <label class="control-label" for="inputDate">Date:</label>
+        <div class="controls">
+          <input data-bind="value: date" type="text" id="inputDate" class="span4 datepicker" placeholder="Date" required/>
+        </div>
+      </div>
+
+      <!-- opponent -->
+      <div class="control-group">
+        <label class="control-label" for="inputOpponent">Opponent:</label>
+        <div class="controls">
+          <input data-bind="value: opponent" type="text" id="inputOpponent" class="span4" placeholder="Opponent" required/>
+        </div>
+      </div>
+
+      <!-- homegame toggle -->
+      <div class="control-group">
+        <label class="control-label" for="inputHomegame">Homegame:</label>
+        <div class="controls">
+          <input data-bind="checked: homegame" type="checkbox" id="inputHomegame" />
+        </div>
+      </div>
+
+      <!-- against goals input -->
+      <div class="control-group">
+        <label class="control-label" for="inputAgainst">Against goals:</label>
+        <div class="controls">
+          <input data-bind="value: opponentGoals" type="text" id="inputAgainst" class="span1"/>
+        </div>
+      </div>
+
+      <!-- player list -->
+      <div class="control-group">
+        <label class="control-label">Players:</label>
+        <div class="controls controls-row">
+          <span data-bind="text: numPlayers()" class="span1 uneditable-input"></span>
+          <span data-bind="text: numSubstitutes()" class="span1 uneditable-input"></span>
+        </div>
+      </div>
+
+      <!-- starting players -->
+      <div class="control-group">
+        <label class="control-label" for="inputStartingPlayers">Starting players:</label>
+        <div class="controls">
+          <select data-bind="options: $root.players, optionsText: 'name', optionsValue: 'id', selectedOptions: startingPlayers"
+            multiple="multiple" id="inputStartingPlayers" size="11"></select>
+        </div>
+      </div>
+
+      <!-- substituted players -->
+      <div class="control-group">
+        <label class="control-label" for="inputSubstitutePlayers">Substituted players:</label>
+        <div class="controls">
+          <select data-bind="options: substitutionCandidates, optionsText: 'name', optionsValue: 'id', selectedOptions: substitutePlayers"
+            multiple="multiple" id="inputSubstitutePlayers" size="4"></select>
+        </div>
+      </div>
+
+      <!-- add new goal -->
+      <div class="control-group">
+        <label class="control-label">Goals:</label>
+        <div class="controls">
+          <div class="input-append">
+            <span data-bind="text: computedGoals()" class="span1 uneditable-input"></span>
+            <button data-bind="click: addGoal" type="button" class="btn">
+              <i class="icon-plus"></i>
+            </button>
           </div>
         </div>
+      </div>
 
-        <!-- goals -->
-        <div class="control-group">
-          <div class="controls">
-            <ul data-bind="foreach: goals" class="unstyled">
-              <li>
-                <select data-bind="options: $parent.goalCandidates(), optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
-                <a data-bind="click: $parent.removeGoal"><i class="icon-remove"></i></a>
-              </li>
-            </ul>
+      <!-- goals -->
+      <div class="control-group">
+        <div class="controls">
+          <ul data-bind="foreach: goals" class="unstyled">
+            <li>
+              <select data-bind="options: $parent.goalCandidates(), optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
+              <a data-bind="click: $parent.removeGoal"><i class="icon-remove"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- add new assist -->
+      <div class="control-group">
+        <label class="control-label">Assists:</label>
+        <div class="controls">
+          <div class="input-append">
+            <span data-bind="text: computedAssists()" class="span1 uneditable-input"></span>
+            <button data-bind="click: addAssist" type="button" class="btn">
+              <i class="icon-plus"></i>
+            </button>
           </div>
         </div>
+      </div>
 
-        <!-- add new assist -->
-        <div class="control-group">
-          <label class="control-label">Assists:</label>
-          <div class="controls">
-            <div class="input-append">
-              <span data-bind="text: computedAssists()" class="span1 uneditable-input"></span>
-              <button data-bind="click: addAssist" type="button" class="btn">
-                <i class="icon-plus"></i>
-              </button>
-            </div>
-          </div>
+      <!-- assists -->
+      <div class="control-group">
+        <div class="controls">
+          <ul data-bind="foreach: assists" class="unstyled">
+            <li>
+              <select data-bind="options: $parent.goalCandidates(), optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
+              <a data-bind="click: $parent.removeAssist"><i class="icon-remove"></i></a>
+            </li>
+          </ul>
         </div>
+      </div>
 
-        <!-- assists -->
-        <div class="control-group">
-          <div class="controls">
-            <ul data-bind="foreach: assists" class="unstyled">
-              <li>
-                <select data-bind="options: $parent.goalCandidates(), optionsText: 'name', optionsValue: 'id', optionsCaption: 'Select...', value: player"></select>
-                <a data-bind="click: $parent.removeAssist"><i class="icon-remove"></i></a>
-              </li>
-            </ul>
-          </div>
+      <!-- buttons -->
+      <div class="control-group">
+        <div class="controls">
+          <button data-bind="click: save, text: actionName, enable: isValid()" type="submit" class="btn btn-primary"></button>
+          <button data-bind="enable: !isNewMatch()" data-target="#modal-delete" data-toggle="modal" type="submit" class="btn btn-danger">Delete</button>
         </div>
+      </div>
 
-        <!-- buttons -->
-        <div class="control-group">
-          <div class="controls">
-            <button data-bind="click: save, text: actionName, enable: isValid()" type="submit" class="btn btn-primary"></button>
-            <button data-bind="enable: !isNewMatch()" data-target="#modal-delete" data-toggle="modal" type="submit" class="btn btn-danger">Delete</button>
-          </div>
+      <!-- modal delete dialog -->
+      <div id="modal-delete" class="modal hide fade" role="dialog">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
+          <h3>Delete match</h3>
         </div>
-
-        <!-- modal delete dialog -->
-        <div id="modal-delete" class="modal hide fade" role="dialog">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
-            <h3>Delete match</h3>
-          </div>
-          <div class="modal-body"><p>Do you really want to delete the current match?</p></div>
-          <div class="modal-footer">
-            <button class="btn btn-danger">Yes, indeed!</button>
-            <button class="btn" data-dismiss="modal">No, better not</button>
-          </div>
+        <div class="modal-body"><p>Do you really want to delete the current match?</p></div>
+        <div class="modal-footer">
+          <button class="btn btn-danger">Yes, indeed!</button>
+          <button class="btn" data-dismiss="modal">No, better not</button>
         </div>
-
+      </div>
     </form>
 
     <div class="footer">

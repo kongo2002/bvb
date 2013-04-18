@@ -153,6 +153,19 @@ function Match(bvb) {
         return self.isNewMatch() ? 'Add match' : 'Edit match';
     });
 
+    this.matchName = ko.computed(function() {
+        var team = 'Borussia Dortmund';
+        if (self.isNewMatch())
+            return '';
+        if (self.homegame()) {
+            return team + ' : ' + self.opponent() + ' - ' +
+                self.computedGoals() + ' : ' + self.opponentGoals();
+        } else {
+            return self.opponent() + ' : ' + team + ' - ' +
+                self.opponentGoals() + ' : ' + self.computedGoals();
+        }
+    });
+
     this.save = function() {
         /* TODO */
         var goals = self.goals();
