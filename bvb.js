@@ -9,7 +9,7 @@ var Utils = {
         var month = date.getMonth() + 1;
         var year = date.getFullYear();
 
-        return this.zeroFilled(month) + '/' + this.zeroFilled(day) + '/' + year;
+        return year + '-' + this.zeroFilled(month) + '-' + this.zeroFilled(day);
     },
     call : function(path, callback, data, mtd) {
         var method = (!mtd) ? (!data) ? 'GET' : 'POST' : mtd;
