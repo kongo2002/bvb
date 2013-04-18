@@ -42,7 +42,7 @@
       <div class="control-group">
         <label class="control-label" for="inputDate">Date:</label>
         <div class="controls">
-          <input data-bind="datepicker: date" type="text" class="span4 datepicker" required/>
+          <input data-bind="datepicker: date" type="text" class="span4 datepicker" required />
         </div>
       </div>
 
@@ -50,7 +50,8 @@
       <div class="control-group">
         <label class="control-label" for="inputOpponent">Opponent:</label>
         <div class="controls">
-          <select data-bind="options: $root.teams, optionsText: 'name', optionsValue: 'id', value: opponent, optionsCaption: 'Select...'"></select>
+          <select data-bind="options: $root.teams, optionsText: 'name', optionsValue: 'id', value: opponent, optionsCaption: 'Select...'" class="span3"></select>
+          <button class="btn" type="button" data-toggle="modal" data-target="#modal-add-opponent"><i class="icon-plus"></i> Add</button>
         </div>
       </div>
 
@@ -154,20 +155,42 @@
           <button data-bind="enable: !isNewMatch()" data-target="#modal-delete" data-toggle="modal" type="submit" class="btn btn-danger">Delete</button>
         </div>
       </div>
-
-      <!-- modal delete dialog -->
-      <div id="modal-delete" class="modal hide fade" role="dialog">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
-          <h3>Delete match</h3>
-        </div>
-        <div class="modal-body"><p>Do you really want to delete the current match?</p></div>
-        <div class="modal-footer">
-          <button class="btn btn-danger">Yes, indeed!</button>
-          <button class="btn" data-dismiss="modal">No, better not</button>
-        </div>
-      </div>
     </form>
+
+    <!-- modal delete dialog -->
+    <div id="modal-delete" class="modal hide fade" role="dialog">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
+        <h3>Delete match</h3>
+      </div>
+      <div class="modal-body"><p>Do you really want to delete the current match?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger">Yes, indeed!</button>
+        <button class="btn" data-dismiss="modal">No, better not</button>
+      </div>
+    </div>
+
+    <!-- add new opponent modal dialog -->
+    <div id="modal-add-opponent" class="modal hide fade" role="dialog">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
+        <h3>Add new team</h3>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="controls-row">
+            <label class="control-label" for="teamName">Team name:</label>
+            <div class="controls">
+              <input type="text" id="teamName" placeholder="Name" required />
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">Submit</button>
+        <button class="btn" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
 
     <div class="footer">
       <noscript>
