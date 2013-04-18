@@ -344,12 +344,25 @@ $(function() {
         /* initialize admin */
         bvb.admin = new ko.observable(new Admin(bvb));
 
+        ko.bindingHandlers.datepicker = {
+            init: function(element, valueAccessor, allBindingsAccessor) {
+              $(element).datepicker({ format : 'yyyy-mm-dd' });
+
+              ko.utils.registerEventHandler(element, "changeDate", function(event) {
+                  var value = valueAccessor();
+                  if (ko.isObservable(value)) {
+                      value(event.date);
+                  }
+              });
+            },
+            update: function(element, valueAccessor)   {
+                var widget = $(element).data("datepicker");
+                if (widget)
+                    widget.setValue(ko.utils.unwrapObservable(valueAccessor()));
+            }
+        };
+
         /* apply knockout MVVM bindings after BVB was initialized */
         ko.applyBindings(bvb);
-
-        /* hook into datepickers */
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd'
-        });
     });
 });
