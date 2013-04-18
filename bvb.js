@@ -83,10 +83,9 @@ function Assist(playerId) {
 
 function Match(bvb) {
     var self = this;
-    var now = Utils.toDateString(new Date());
 
     this.id = ko.observable(0);
-    this.date = ko.observable(now);
+    this.date = ko.observable(new Date());
     this.opponent = ko.observable('');
     this.opponentGoals = ko.observable(0);
     this.homegame = ko.observable(true);
