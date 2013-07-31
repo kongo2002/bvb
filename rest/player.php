@@ -32,6 +32,14 @@ class Player
             'name' => $player[1].' '.$player[2],
             'position' => $player[3]);
     }
+
+    public static function exists($db, $id)
+    {
+        $cmd = $db->prepare('SELECT COUNT(id) FROM players WHERE id=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        return $cmd->fetchColumn() > 0;
+    }
 }
 
 class Position
