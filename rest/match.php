@@ -161,21 +161,24 @@ class Match
             throw new ApiException('invalid number of substituted players given: '.$substitutes);
 
         /* check players in sub element arrays */
-        if (!playersExist($match->goals) ||
-            !playersExist($match->owngoals) ||
-            !playersExist($match->starters) ||
-            !playersExist($match->substitutes))
-        {
+        $getId = function($player) {
+            return isset($player->id) ? $player->id : 0;
+        };
+
+        $players = array_unique(array_map($getId, array_merge($match->goals,
+            $match->owngoals,
+            $match->starters,
+            $match->substitutes)));
+
+        if (!playersExist($players))
             throw new ApiException('invalid player given');
-        }
     }
 
-    private static function playersExist($elements)
+    private static function playersExist($ids)
     {
-        foreach ($elements as $elem)
+        foreach ($ids as $id)
         {
-            $exists = isset($elem->id) && $elem->id > 0 &&
-                Player::exists($elem->id);
+            $exists = $id > 0 && Player::exists($id);
 
             if (!$exists)
                 return false;
