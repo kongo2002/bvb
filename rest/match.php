@@ -123,6 +123,14 @@ class Match
         return array($starters, $subs);
     }
 
+    public static function exists($db, $id)
+    {
+        $cmd = $db->prepare('SELECT COUNT(id) FROM matches WHERE id=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        return $cmd->fetchColumn() > 0;
+    }
+
     private static function opponentExists($db, $opponentId)
     {
         $cmd = $db->prepare('SELECT COUNT(id) FROM teams WHERE id=:id;');
