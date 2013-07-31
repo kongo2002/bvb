@@ -9,7 +9,8 @@ class MatchEvent
         if (!$event || !MatchEvent::validate($event))
             throw new ApiException('invalid event given');
 
-        $cmd = $db->prepare('INSERT INTO teams (match,player,goals,owngoals,assists) '.
+        $cmd = $db->prepare('INSERT INTO matchevents '.
+            '(match,player,goals,owngoals,assists) '.
             'VALUES (:m,:p,:g,:og,:a);');
         $cmd->execute(array(':m' => $event->match,
             ':p' => $event->player,
