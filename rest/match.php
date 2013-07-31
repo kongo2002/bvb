@@ -141,14 +141,47 @@ class Match
 
     private static function validate($db, $match)
     {
-        if (!isset($match->opponent) || $match->opponent < 1)
-            throw new ApiException('no or invalid opponent given');
-
+        /* check date */
         if (!isset($match->date))
             throw new ApiException('no date given');
 
+        /* check opponent */
+        if (!isset($match->opponent) || $match->opponent < 1)
+            throw new ApiException('no or invalid opponent given');
+
         if (!Match::opponentExists($db, $match->opponent))
             throw new ApiException('there is no opponent '.$match->opponent);
+
+        $starters = count($match->starters);
+        if ($starters != 11)
+            throw new ApiException('invalid number of starting players given: '.$starters);
+
+        $substitutes = count($match->substitutes);
+        if ($substitutes < 0 || $substitutes > 3)
+            throw new ApiException('invalid number of substituted players given: '.$substitutes);
+
+        /* check players in sub element arrays */
+        if (!playersExist($match->goals) ||
+            !playersExist($match->owngoals) ||
+            !playersExist($match->starters) ||
+            !playersExist($match->substitutes))
+        {
+            throw new ApiException('invalid player given');
+        }
+    }
+
+    private static function playersExist($elements)
+    {
+        foreach ($elements as $elem)
+        {
+            $exists = isset($elem->id) && $elem->id > 0 &&
+                Player::exists($elem->id);
+
+            if (!$exists)
+                return false;
+        }
+
+        return true;
     }
 
     private static function setDefaultValues($match)
@@ -161,14 +194,29 @@ class Match
 
         $match->opponentGoals = isset($match->opponentGoals)
             ? $match->opponentGoals : 0;
+
+        $match->assists = isset($match->assists)
+            ? $match->assists : array();
+
+        $match->goals = isset($match->goals)
+            ? $match->goals : array();
+
+        $match->owngoals = isset($match->owngoals)
+            ? $match->owngoals : array();
+
+        $match->starters = isset($match->starters)
+            ? $match->starters : array();
+
+        $match->substitutes = isset($match->substitutes)
+            ? $match->substitutes : array();
     }
 
     public static function add($db, $match)
     {
+        Match::setDefaultValues($match);
         Match::validate($db, $match);
 
-        Match::setDefaultValues($match);
-
+        /* insert match into the database */
         $cmd = $db->prepare('INSERT INTO matches '.
             '(opponent,tournament,homegame,date,opponent_goals) '.
             'VALUES (:op,:tour,:hg,:d,:og);');
@@ -178,6 +226,8 @@ class Match
             ':hg' => $match->homegame,
             ':d' => $match->date,
             ':og' => $match->opponentGoals));
+
+        /* TODO: insert match events (if specified) */
 
         return $db->lastInsertId();
     }
