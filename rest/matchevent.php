@@ -49,3 +49,5 @@ class MatchEvent
             $event->assists = 0;
     }
 }
+
+?>

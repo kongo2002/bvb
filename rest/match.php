@@ -142,8 +142,8 @@ class Match
     private static function validate($db, $match)
     {
         /* check date */
-        if (!isset($match->date))
-            throw new ApiException('no date given');
+        if (!isset($match->date) || !Utils::isValidDate($match->date))
+            throw new ApiException('no or invalid date given');
 
         /* check opponent */
         if (!isset($match->opponent) || $match->opponent < 1)
