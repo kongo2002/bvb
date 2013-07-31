@@ -20,7 +20,8 @@ class RestFormat
 }
 
 /**
- * Description of RestServer
+ * Server class that encapsulates the basic REST
+ * behavior.
  */
 class RestServer
 {
@@ -371,8 +372,10 @@ class RestServer
             ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
             : (isset($_GET['method']) ? $_GET['method'] : '');
 
+        # PUT may override POST
         if ($method == 'POST' && strtoupper($override) == 'PUT')
             $method = 'PUT';
+        # DELETE may override POST as well
         elseif ($method == 'POST' && strtoupper($override) == 'DELETE')
             $method = 'DELETE';
 
@@ -381,6 +384,7 @@ class RestServer
 
     public function getFormat()
     {
+        # JSON is the default format
         $format = RestFormat::JSON;
 
         # format may be overwritten by GET parameter
@@ -401,6 +405,7 @@ class RestServer
 
     public function sendError($code, $message)
     {
+        # set some default headers
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');
         header('Content-Type: ' . $this->format);
@@ -419,6 +424,7 @@ class RestServer
 
     public function sendData($data)
     {
+        # set some default headers
         header("Cache-Control: no-cache, must-revalidate");
         header("Expires: 0");
         header('Content-Type: ' . $this->format);
@@ -499,3 +505,5 @@ class ApiException extends Exception
         parent::__construct($message, $errorCode);
     }
 }
+
+?>

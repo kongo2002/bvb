@@ -20,6 +20,7 @@ $server = new RestServer($mode, 'BVB_REST');
 # uncomment to clear the cache in production mode
 $server->refreshCache();
 
+# register controllers and its routes
 $server->addClass('BaseController', '/');
 $server->addClass('UserController', 'users');
 $server->addClass('PlayerController', 'players');
