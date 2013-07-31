@@ -40,6 +40,17 @@ class Player
 
         return $cmd->fetchColumn() > 0;
     }
+
+    public static function existAll($db, $ids)
+    {
+        $len = count($ids);
+        $idList = implode(',', $ids);
+        $query = 'SELECT COUNT(id) FROM players WHERE id IN ('.$idList.');';
+
+        $cmd = $db->query($query);
+
+        return $cmd->fetchColumn() == $len;
+    }
 }
 
 class Position

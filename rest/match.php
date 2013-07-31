@@ -165,26 +165,17 @@ class Match
             return isset($player->id) ? $player->id : 0;
         };
 
-        $players = array_unique(array_map($getId, array_merge($match->goals,
-            $match->owngoals,
-            $match->starters,
-            $match->substitutes)));
+        $starterIds = array_unique(array_map($getId, $match->starters));
+        if (count($starterIds) != 11)
+            throw new ApiException('invalid number of unique starting players given');
 
-        if (!playersExist($players))
-            throw new ApiException('invalid player given');
-    }
+        $playerIds = array_merge($starterIds,
+            array_map($getId, $match->goals),
+            array_map($getId, $match->owngoals),
+            array_map($getId, $match->substitutes));
 
-    private static function playersExist($ids)
-    {
-        foreach ($ids as $id)
-        {
-            $exists = $id > 0 && Player::exists($id);
-
-            if (!$exists)
-                return false;
-        }
-
-        return true;
+        if (!Player::existAll($db, array_unique($playerIds)))
+            throw new ApiException('at least one invalid player given');
     }
 
     private static function setDefaultValues($match)
