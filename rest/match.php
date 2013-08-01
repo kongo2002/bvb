@@ -269,28 +269,30 @@ class Match
 
         $matchId = $db->lastInsertId();
 
-        /* TODO: insert match events (if specified) */
+        Match::processEvents($db, $matchId, $match);
 
-        /* group match events by player */
+        return $matchId;
+    }
+
+    private static function processEvents($db, $id, $match)
+    {
         $players = array();
 
         /* aggregate goals */
         foreach ($match->goals as $goal)
-            Match::process($matchId, $players, $goal, 'addGoal');
+            Match::process($id, $players, $goal, 'addGoal');
 
         /* aggregate assists */
         foreach ($match->assists as $assist)
-            Match::process($matchId, $players, $assist, 'addAssist');
+            Match::process($id, $players, $assist, 'addAssist');
 
         /* aggregate own goals */
         foreach ($match->owngoals as $owngoal)
-            Match::process($matchId, $players, $owngoal, 'addOwnGoal');
+            Match::process($id, $players, $owngoal, 'addOwnGoal');
 
         /* insert match events (if specified) */
         foreach ($players as $pInfo)
             MatchEvent::add($db, $pInfo);
-
-        return $matchId;
     }
 
     private static function process($match, &$players, $elem, $funcName)
