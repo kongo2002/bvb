@@ -269,7 +269,15 @@ class Match
 
         $matchId = $db->lastInsertId();
 
+        /* insert match events */
         Match::processEvents($db, $matchId, $match);
+
+        /* process starters and substituted players */
+        foreach ($match->starters as $player)
+            MatchUp::addStarter($db, $player->id, $matchId);
+
+        foreach ($match->substitutes as $player)
+            MatchUp::addSubstitution($db, $player->id, $matchId);
 
         return $matchId;
     }
