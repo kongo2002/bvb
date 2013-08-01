@@ -1,3 +1,4 @@
 Makefile
 config.inc.php
+rest/*.sh
 tags
