@@ -13,4 +13,5 @@ class Utils
             count($date['errors']) < 1;
     }
 }
+
 ?>

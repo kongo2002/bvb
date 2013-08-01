@@ -2,51 +2,36 @@
 
 class MatchEvent
 {
-    public static function add($db, $event)
+    public static function add($db, $playerInfo)
     {
-        MatchEvent::setDefaultValues($event);
-
-        if (!$event || !MatchEvent::validate($event))
+        if (!$playerInfo || !MatchEvent::validate($db, $playerInfo))
             throw new ApiException('invalid event given');
 
         $cmd = $db->prepare('INSERT INTO matchevents '.
-            '(match,player,goals,owngoals,assists) '.
+            '(`match`,player,goals,owngoals,assists) '.
             'VALUES (:m,:p,:g,:og,:a);');
-        $cmd->execute(array(':m' => $event->match,
-            ':p' => $event->player,
-            ':g' => $event->goals,
-            ':og' => $event->owngoals,
-            ':a' => $event->assists));
+
+        $cmd->execute(array(':m' => $playerInfo->match,
+            ':p' => $playerInfo->id,
+            ':g' => $playerInfo->goals,
+            ':og' => $playerInfo->owngoals,
+            ':a' => $playerInfo->assists));
 
         return $db->lastInsertId();
     }
 
-    private static function validate($db, $event)
+    private static function validate($db, $playerInfo)
     {
-        $sumActions = $event->goals + $event->owngoals + $event->assists;
-
-        if ($sumActions < 1)
+        if ($playerInfo->getActions() < 1)
             throw new ApiException('event contains no actions at all');
 
-        if (!isset($event->match) || !Match::exists($event->match))
+        if (!Match::exists($db, $playerInfo->match))
             throw new ApiException('specified match does not exist');
 
-        if (!isset($event->player) || !Player::exists($event->player))
+        if (!Player::exists($db, $playerInfo->id))
             throw new ApiException('specified player does not exist');
 
         return true;
-    }
-
-    private static function setDefaultValues($event)
-    {
-        if (!isset($event->goals))
-            $event->goals = 0;
-
-        if (!isset($event->owngoals))
-            $event->owngoals = 0;
-
-        if (!isset($event->assists))
-            $event->assists = 0;
     }
 }
 

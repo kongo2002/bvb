@@ -1,5 +1,40 @@
 <?php
 
+class PlayerInfo
+{
+    public function __construct($id, $matchId)
+    {
+        $this->id = $id;
+        $this->match = $matchId;
+
+        $this->goals = 0;
+        $this->assists = 0;
+        $this->owngoals = 0;
+    }
+
+    public function addGoal($count = 1)
+    {
+        $this->goals += $count;
+    }
+
+    public function addAssist($count = 1)
+    {
+        $this->assists += $count;
+    }
+
+    public function addOwnGoal($count = 1)
+    {
+        $this->owngoals += $count;
+    }
+
+    public function getActions()
+    {
+        return $this->goals +
+            $this->assists +
+            $this->owngoals;
+    }
+}
+
 class Match
 {
     private static $teamName = 'Borussia Dortmund';
@@ -176,6 +211,8 @@ class Match
 
         if (!Player::existAll($db, array_unique($playerIds)))
             throw new ApiException('at least one invalid player given');
+
+        return $playerIds;
     }
 
     private static function setDefaultValues($match)
@@ -205,10 +242,19 @@ class Match
             ? $match->substitutes : array();
     }
 
+    /**
+     * Add a new match into the database
+     *
+     * @param PDO    db     database instance
+     * @param Object match  match object to add
+     */
     public static function add($db, $match)
     {
+        /* set some default values */
         Match::setDefaultValues($match);
-        Match::validate($db, $match);
+
+        /* valid input and retrieve all player IDs */
+        $playerIds = Match::validate($db, $match);
 
         /* insert match into the database */
         $cmd = $db->prepare('INSERT INTO matches '.
@@ -221,9 +267,50 @@ class Match
             ':d' => $match->date,
             ':og' => $match->opponentGoals));
 
+        $matchId = $db->lastInsertId();
+
         /* TODO: insert match events (if specified) */
 
-        return $db->lastInsertId();
+        /* group match events by player */
+        $players = array();
+
+        /* aggregate goals */
+        foreach ($match->goals as $goal)
+            Match::process($matchId, $players, $goal, 'addGoal');
+
+        /* aggregate assists */
+        foreach ($match->assists as $assist)
+            Match::process($matchId, $players, $assist, 'addAssist');
+
+        /* aggregate own goals */
+        foreach ($match->owngoals as $owngoal)
+            Match::process($matchId, $players, $owngoal, 'addOwnGoal');
+
+        /* insert match events (if specified) */
+        foreach ($players as $pInfo)
+            MatchEvent::add($db, $pInfo);
+
+        return $matchId;
+    }
+
+    private static function process($match, &$players, $elem, $funcName)
+    {
+        $player = null;
+        $id = $elem->id;
+
+        if (!isset($players[$id]))
+        {
+            $player = new PlayerInfo($id, $match);
+            $players[$id] = $player;
+        }
+        else
+            $player = $players[$id];
+
+        $count = isset($elem->count) ? $elem->count : 1;
+        if ($count < 1)
+            $count = 1;
+
+        call_user_func_array(array($player, $funcName), array($count));
     }
 
     public static function update($db, $match)
