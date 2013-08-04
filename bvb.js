@@ -40,10 +40,15 @@ var Utils = {
                 failure();
         }
 
+        var postData = data
+            ? (typeof data === 'string' ? data : JSON.stringify(data))
+            : null;
+
         $.ajax(url, {
             type: method,
             success: onSuccess,
-            error: onFailure
+            error: onFailure,
+            data: postData
         });
     },
     contains : function(array, element) {
@@ -169,7 +174,10 @@ function Match(bvb) {
     this.save = function() {
         var dto = self.toDto();
 
-        console.debug(dto);
+        Utils.call('matches/match', function(m) {
+            /* update match with returned ID */
+            self.id(m.id);
+        }, dto);
     }
 
     this.remove = function() {
@@ -204,8 +212,13 @@ Match.prototype.toDto = function() {
     dto.opponentGoals = this.opponentGoals();
     dto.starters = this.startingPlayers();
     dto.substitutes = this.substitutePlayers();
-    dto.goals = this.goals();
-    dto.assists = this.assists();
+
+    var getPlayer = function(elem) {
+        return { id: elem.player() };
+    };
+
+    dto.goals = $.map(this.goals(), getPlayer);
+    dto.assists = $.map(this.assists(), getPlayer);
 
     return dto;
 }
@@ -350,7 +363,8 @@ $(function() {
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         cache: false,
-        timeout: 5000
+        timeout: 5000,
+        processData: false
     });
 
     /* initialize BVB instance */

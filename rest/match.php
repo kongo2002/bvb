@@ -200,14 +200,13 @@ class Match
             return isset($player->id) ? $player->id : 0;
         };
 
-        $starterIds = array_unique(array_map($getId, $match->starters));
+        $starterIds = array_unique($match->starters);
         if (count($starterIds) != 11)
             throw new ApiException('invalid number of unique starting players given');
 
-        $playerIds = array_merge($starterIds,
+        $playerIds = array_merge($starterIds, $match->substitutes,
             array_map($getId, $match->goals),
-            array_map($getId, $match->owngoals),
-            array_map($getId, $match->substitutes));
+            array_map($getId, $match->owngoals));
 
         if (!Player::existAll($db, array_unique($playerIds)))
             throw new ApiException('at least one invalid player given');
@@ -274,10 +273,10 @@ class Match
 
         /* process starters and substituted players */
         foreach ($match->starters as $player)
-            MatchUp::addStarter($db, $player->id, $matchId);
+            MatchUp::addStarter($db, $player, $matchId);
 
         foreach ($match->substitutes as $player)
-            MatchUp::addSubstitution($db, $player->id, $matchId);
+            MatchUp::addSubstitution($db, $player, $matchId);
 
         return $matchId;
     }
