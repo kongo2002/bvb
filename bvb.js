@@ -274,8 +274,11 @@ function Admin(bvb) {
         var m = self.match();
         if (!m.isNewMatch()) {
             Utils.call('matches/match/'+m.id(), function() {
-                /* reset currently displayed match */
-                self.selectedMatch(null);
+                /* refresh match list */
+                bvb.loadMatches(function() {
+                    /* reset currently displayed match */
+                    self.selectedMatch(null);
+                });
             }, null, 'DELETE');
         }
     };
