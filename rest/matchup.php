@@ -11,8 +11,8 @@ class MatchUp
             throw new ApiException('invalid match ID given');
 
         $query = $substituted
-            ? 'INSERT INTO matchup (player,`match`) VALUES (:p,:m);'
-            : 'INSERT INTO matchup (player,`match`,substitution) VALUES (:p,:m,1);';
+            ? 'INSERT INTO matchup (player,`match`,substitution) VALUES (:p,:m,1);'
+            : 'INSERT INTO matchup (player,`match`) VALUES (:p,:m);';
 
         $cmd = $db->prepare($query);
         $cmd->execute(array(':p' => $player, ':m' => $match));
