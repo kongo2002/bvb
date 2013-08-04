@@ -93,7 +93,6 @@ function Match(bvb) {
 
     this.id = ko.observable(0);
     this.date = ko.observable(new Date());
-    this.name = ko.observable('');
     this.opponent = ko.observable(0);
     this.opponentGoals = ko.observable(0);
     this.homegame = ko.observable(true);
@@ -155,6 +154,16 @@ function Match(bvb) {
     this.isNewMatch = function() {
         return self.id() < 1;
     }
+
+    this.name = ko.computed(function() {
+        var opp = self.opponent();
+        if (opp > 0) {
+            var team = bvb.getTeam(opp);
+            if (team != null)
+                return team.name;
+        }
+        return '';
+    });
 
     this.actionName = ko.computed(function() {
         return self.isNewMatch() ? 'Add match' : 'Edit match';
@@ -232,7 +241,6 @@ Match.fromDto = function(dto, bvb) {
 
     m.id(dto.id);
     m.homegame(dto.homegame);
-    m.name(dto.name);
     m.opponent(dto.opponent);
     m.opponentGoals(dto.opponentGoals);
     m.date(dto.date);
@@ -342,6 +350,17 @@ BVB.prototype.loadMatches = function(callback) {
             callback.call(self, ms);
         }
     });
+};
+
+BVB.prototype.getTeam = function(id) {
+    var teams = this.teams();
+    var len = teams.length;
+    for (var i=0; i<len; i++) {
+        var team = teams[i];
+        if (team.id == id)
+            return team;
+    }
+    return null;
 };
 
 BVB.prototype.getPlayer = function(id) {
