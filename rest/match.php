@@ -324,12 +324,12 @@ class Match
 
     public static function update($db, $match)
     {
-        Match::validate($db, $match);
+        Match::setDefaultValues($match);
+
+        $playerIds = Match::validate($db, $match);
 
         if (!isset($match->id) || $match->id < 1)
             throw new ApiException('no or invalid match ID given');
-
-        Match::setDefaultValues($match);
 
         $cmd = $db->prepare('UPDATE matches SET '.
             'opponent=:op,'.
@@ -345,6 +345,8 @@ class Match
             ':d' => $match->date,
             ':og' => $match->opponentGoals,
             ':id' => $match->id));
+
+        /* TODO: update events and players */
 
         return $cmd->rowCount() > 0;
     }
