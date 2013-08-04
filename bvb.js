@@ -16,10 +16,18 @@ var Utils = {
         var url = 'rest/' + path;
 
         var failure = function(error) {
-            if (error)
-                console.error(error);
-            else
-                console.error(method + ' "' + url + '" failed unexpectedly');
+            var msg = error
+                ? error
+                : method + ' "' + url + '" failed unexpectedly';
+
+            console.error(msg);
+
+            /* show alert box */
+            var box = $('#alertdiv');
+            if (box) {
+                box.find('span').text(msg);
+                box.addClass('in');
+            }
         }
 
         var onFailure = function(_, stat, error) {
@@ -430,5 +438,10 @@ $(function() {
 
         /* apply knockout MVVM bindings after BVB was initialized */
         ko.applyBindings(bvb);
+    });
+
+    /* initialize alert box */
+    $('#alertdiv .close').on('click', function() {
+        $(this).parent().removeClass('in');
     });
 });
