@@ -32,7 +32,7 @@ var Utils = {
         }
 
         var onSuccess = function(response) {
-            if (response && response.success)
+            if (callback && response && response.success)
                 callback(response.data);
             else if (response.message)
                 failure(response.message);
@@ -174,10 +174,17 @@ function Match(bvb) {
     this.save = function() {
         var dto = self.toDto();
 
-        Utils.call('matches/match', function(m) {
-            /* update match with returned ID */
-            self.id(m.id);
-        }, dto);
+        /* add new match */
+        if (self.isNewMatch()) {
+            Utils.call('matches/match', function(m) {
+                /* update match with returned ID */
+                self.id(m.id);
+            }, dto);
+        }
+        /* edit existing match */
+        else {
+            Utils.call('matches/match', null, dto, 'PUT');
+        }
     }
 
     this.remove = function() {
