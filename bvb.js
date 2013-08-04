@@ -189,12 +189,6 @@ function Match(bvb) {
         }
     }
 
-    this.remove = function() {
-        var id = self.id();
-
-        Utils.call('matches/match/'+id, null, null, 'DELETE');
-    }
-
     this.addGoal = function() {
         self.goals.push(new Goal());
     }
@@ -275,6 +269,16 @@ function Admin(bvb) {
         } else
             self.match(new Match(bvb));
     });
+
+    this.remove = function() {
+        var m = self.match();
+        if (!m.isNewMatch()) {
+            Utils.call('matches/match/'+m.id(), function() {
+                /* reset currently displayed match */
+                self.selectedMatch(null);
+            }, null, 'DELETE');
+        }
+    };
 }
 
 function BVB() {
