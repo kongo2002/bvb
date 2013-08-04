@@ -31,12 +31,15 @@ class RestServer
     public $format;
     public $cacheDir = '.';
     public $realm;
-    public $mode;
     public $root;
+    public $mode;
+    public $isDebug;
 
     protected $map = array();
     protected $errorClasses = array();
     protected $cached;
+
+    private $errors;
 
     /**
      * The constructor.
@@ -47,6 +50,7 @@ class RestServer
     public function  __construct($mode = 'debug', $realm = 'REST')
     {
         $this->mode = $mode;
+        $this->isDebug = $mode == 'debug';
         $this->realm = $realm;
         $dir = dirname(str_replace($_SERVER['DOCUMENT_ROOT'], '', $_SERVER['SCRIPT_FILENAME']));
         $this->root = ($dir == '.' ? '' : $dir . '/');
@@ -55,6 +59,24 @@ class RestServer
         $len = strlen($this->root);
         if ($len > 0 && $this->root[0] == '/')
             $this->root = substr($this->root, 1);
+
+        # set custom error handler
+        set_error_handler(array($this, 'errorHandler'));
+    }
+
+    public function errorHandler($errNo, $errStr)
+    {
+        # collect errors in debug mode only
+        if ($this->isDebug)
+        {
+            if ($this->errors)
+                $this->errors .= "\n".$errNo.': '.$errStr;
+            else
+                $this->errors = $errNo.': '.$errStr;
+        }
+
+        # stop default error handling
+        return true;
     }
 
     public function  __destruct()
@@ -149,6 +171,10 @@ class RestServer
             catch (ApiException $e)
             {
                 return $this->sendError($e->getCode(), $e->getMessage());
+            }
+            catch (Exception $e)
+            {
+                return $this->sendError(0, $e->getMessage());
             }
 
             if ($result !== null)
@@ -409,6 +435,9 @@ class RestServer
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');
         header('Content-Type: ' . $this->format);
+
+        if ($this->errors)
+            $message .= "\n".$this->errors;
 
         if ($this->format == RestFormat::JSON)
         {
