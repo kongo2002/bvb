@@ -354,6 +354,14 @@ class Match
         if ($id < 1)
             throw new ApiException('no or invalid ID given');
 
+        /* delete events and matchup */
+        $cmd = $db->prepare('DELETE FROM matchup WHERE `match`=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        $cmd = $db->prepare('DELETE FROM matchevents WHERE `match`=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        /* delete match itself */
         $cmd = $db->prepare('DELETE FROM matches WHERE id=:id;');
         $cmd->execute(array(':id' => $id));
 

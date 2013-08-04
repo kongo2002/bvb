@@ -158,14 +158,14 @@
     </form>
 
     <!-- modal delete dialog -->
-    <div id="modal-delete" class="modal hide fade" role="dialog">
+    <div id="modal-delete" class="modal hide fade" role="dialog" data-bind="with: match">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
         <h3>Delete match</h3>
       </div>
       <div class="modal-body"><p>Do you really want to delete the current match?</p></div>
       <div class="modal-footer">
-        <button class="btn btn-danger">Yes, indeed!</button>
+        <button class="btn btn-danger" data-bind="click: remove" data-dismiss="modal">Yes, indeed!</button>
         <button class="btn" data-dismiss="modal">No, better not</button>
       </div>
     </div>

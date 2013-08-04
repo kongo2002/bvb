@@ -32,8 +32,10 @@ var Utils = {
         }
 
         var onSuccess = function(response) {
-            if (callback && response && response.success)
-                callback(response.data);
+            if (response && response.success) {
+                if (callback)
+                    callback(response.data);
+            }
             else if (response.message)
                 failure(response.message);
             else
@@ -188,8 +190,9 @@ function Match(bvb) {
     }
 
     this.remove = function() {
-        /* TODO */
-        console.debug(self.id());
+        var id = self.id();
+
+        Utils.call('matches/match/'+id, null, null, 'DELETE');
     }
 
     this.addGoal = function() {
