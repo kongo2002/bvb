@@ -167,8 +167,9 @@ function Match(bvb) {
     });
 
     this.save = function() {
-        /* TODO */
-        console.debug(self.date());
+        var dto = self.toDto();
+
+        console.debug(dto);
     }
 
     this.remove = function() {
@@ -191,6 +192,22 @@ function Match(bvb) {
     this.removeAssist = function(assist) {
         self.assists.remove(assist);
     }
+}
+
+Match.prototype.toDto = function() {
+    var dto = new Object();
+
+    dto.id = this.id();
+    dto.opponent = this.opponent();
+    dto.homegame = this.homegame();
+    dto.date = this.date();
+    dto.opponentGoals = this.opponentGoals();
+    dto.starters = this.startingPlayers();
+    dto.substitutes = this.substitutePlayers();
+    dto.goals = this.goals();
+    dto.assists = this.assists();
+
+    return dto;
 }
 
 Match.fromDto = function(dto, bvb) {
