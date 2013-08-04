@@ -33,7 +33,7 @@ class RestServer
     public $realm;
     public $root;
     public $mode;
-    public $isDebug;
+    public $inProduction;
 
     protected $map = array();
     protected $errorClasses = array();
@@ -50,7 +50,7 @@ class RestServer
     public function  __construct($mode = 'debug', $realm = 'REST')
     {
         $this->mode = $mode;
-        $this->isDebug = $mode == 'debug';
+        $this->inProduction = $mode == 'production';
         $this->realm = $realm;
         $dir = dirname(str_replace($_SERVER['DOCUMENT_ROOT'], '', $_SERVER['SCRIPT_FILENAME']));
         $this->root = ($dir == '.' ? '' : $dir . '/');
@@ -67,7 +67,7 @@ class RestServer
     public function errorHandler($errNo, $errStr)
     {
         # collect errors in debug mode only
-        if ($this->isDebug)
+        if (!$this->inProduction)
         {
             if ($this->errors)
                 $this->errors .= "\n".$errNo.': '.$errStr;
@@ -81,7 +81,7 @@ class RestServer
 
     public function  __destruct()
     {
-        if ($this->mode == 'production' && !$this->cached) {
+        if ($this->inProduction && !$this->cached) {
             if (function_exists('apc_store')) {
                 apc_store('urlMap', $this->map);
             } else {
@@ -230,7 +230,7 @@ class RestServer
         }
 
         $message = $this->codes[$statusCode] .
-            ($errorMessage && $this->mode == 'debug' ? ': ' . $errorMessage : '');
+            ($errorMessage && !$this->inProduction ? ': ' . $errorMessage : '');
 
         $this->setStatus($statusCode);
         $this->sendError($statusCode, $message);
@@ -242,7 +242,7 @@ class RestServer
 
         $this->cached = false;
 
-        if ($this->mode == 'production')
+        if ($this->inProduction)
         {
             if (function_exists('apc_fetch'))
                 $map = apc_fetch('urlMap');
