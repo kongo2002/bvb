@@ -164,6 +164,9 @@
       <span></span>
     </div>
 
+    <!-- login button -->
+    <a class="btn" data-toggle="modal" href="#loginDialog">Login</a>
+
     <!-- modal delete dialog -->
     <div id="modal-delete" class="modal hide fade" role="dialog">
       <div class="modal-header">
@@ -196,6 +199,24 @@
       <div class="modal-footer">
         <button class="btn btn-primary">Submit</button>
         <button class="btn" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+
+    <!-- login modal dialog -->
+    <div class="modal hide" id="loginDialog">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">x</button>
+        <h3>Login</h3>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="" name="login_form">
+          <p><input type="text" class="span3" name="user" placeholder="email" /></p>
+          <p><input type="password" class="span3" name="password" placeholder="password" /></p>
+          <p>
+            <button type="submit" class="btn btn-primary">Login</button>
+            <a href="#">Forgot password?</a>
+          </p>
+        </form>
       </div>
     </div>
 
