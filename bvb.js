@@ -444,4 +444,18 @@ $(function() {
     $('#alertdiv .close').on('click', function() {
         $(this).parent().removeClass('in');
     });
+
+    /* initialize login form */
+    $('#loginDialog').on('submit', function(ev) {
+        /* deactivate default button behavior */
+        ev.preventDefault();
+
+        var formDiv = $(this);
+        var user = $('#user').val();
+        var pw = $('#password').val();
+
+        Utils.call('login', function(x) {
+            formDiv.modal('hide');
+        }, { user: user, password: pw });
+    });
 });

@@ -18,12 +18,14 @@ class BaseController
      *
      * @url POST /login
      */
-    public function login()
+    public function login($data)
     {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+        if (!$data || !$data->user || !$data->password)
+            throw new ApiException('invalid username/password given');
 
         // TODO: validate input and log the user in
+
+        return $data->user.";".$data->password;
     }
 }
 

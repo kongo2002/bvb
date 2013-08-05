@@ -21,7 +21,7 @@ $server = new RestServer($mode, 'BVB_REST');
 $server->refreshCache();
 
 # register controllers and its routes
-$server->addClass('BaseController', '/');
+$server->addClass('BaseController', '');
 $server->addClass('UserController', 'users');
 $server->addClass('PlayerController', 'players');
 $server->addClass('MatchController', 'matches');
