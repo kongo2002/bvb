@@ -301,9 +301,22 @@ function Admin(bvb) {
 }
 
 function BVB() {
+    var self = this;
+
+    /* matches, teams and players */
     this.matches = ko.observableArray();
     this.players = ko.observableArray();
     this.teams = ko.observableArray();
+
+    /* login information */
+    this.loggedIn = ko.observable(false);
+    this.user = ko.observable('');
+
+    this.welcome = ko.computed(function() {
+        if (self.loggedIn())
+            return 'Welcome, ' + self.user();
+        return 'Login';
+    });
 };
 
 BVB.prototype.loadPlayers = function(callback) {
@@ -400,6 +413,23 @@ BVB.prototype.init = function(callback) {
     this.loadTeams(chain);
 };
 
+BVB.prototype.login = function(user, password, callback) {
+    var self = this;
+
+    /* trigger authorization call */
+    Utils.call('login', function(x) {
+        /* update login status */
+        self.loggedIn(true);
+
+        if (x.user)
+            self.user(x.user);
+
+        /* invoke callback if given */
+        if (callback)
+            callback.call(self, x);
+    }, { user: user, password: password });
+};
+
 $(function() {
     /* global AJAX setup */
     $.ajaxSetup({
@@ -454,8 +484,8 @@ $(function() {
         var user = $('#user').val();
         var pw = $('#password').val();
 
-        Utils.call('login', function(x) {
+        bvb.login(user, pw, function() {
             formDiv.modal('hide');
-        }, { user: user, password: pw });
+        });
     });
 });

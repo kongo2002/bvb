@@ -25,7 +25,10 @@ class BaseController
 
         // TODO: validate input and log the user in
 
-        return $data->user.";".$data->password;
+        $result = array();
+        $result['user'] = $data->user;
+
+        return $result;
     }
 }
 
