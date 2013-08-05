@@ -1,5 +1,54 @@
 <?php
 
+class User
+{
+    public function __construct($id, $user)
+    {
+        $this->id = $id;
+        $this->user = $user;
+    }
+}
+
+class Login
+{
+    public function __construct($database)
+    {
+        $this->db = $database;
+
+        $this->userId = 0;
+        $this->loggedIn = false;
+    }
+
+    public function login($user, $password)
+    {
+        if (empty($user) || empty($password))
+            return null;
+
+        $cmd = $this->db->prepare('SELECT id,user FROM users '.
+            'WHERE user=:u AND password_hash=:p;');
+
+        $cmd->execute(array(
+            ':u' => trim($user),
+            ':p' => md5($password)));
+
+        # fetch first result
+        $match = $cmd->fetch(PDO::FETCH_ASSOC);
+
+        # the login succeeded
+        if ($match)
+        {
+            $id = $match['id'];
+
+            $this->userId = $id;
+            $this->loggedIn = true;
+
+            return new User($id, $match['user']);
+        }
+
+        return null;
+    }
+}
+
 class BaseController
 {
     /**
@@ -23,12 +72,13 @@ class BaseController
         if (!$data || !$data->user || !$data->password)
             throw new ApiException('invalid username/password given');
 
-        // TODO: validate input and log the user in
+        $login = new Login($this->database);
+        $user = $login->login($data->user, $data->password);
 
-        $result = array();
-        $result['user'] = $data->user;
+        if ($user)
+            return $user;
 
-        return $result;
+        throw new ApiException('there is no valid match for the given user/password');
     }
 }
 

@@ -5,7 +5,6 @@ require_once('server.php');
 
 # load controllers
 require_once('base.php');
-require_once('user.php');
 require_once('player.php');
 require_once('match.php');
 require_once('team.php');
@@ -22,7 +21,6 @@ $server->refreshCache();
 
 # register controllers and its routes
 $server->addClass('BaseController', '');
-$server->addClass('UserController', 'users');
 $server->addClass('PlayerController', 'players');
 $server->addClass('MatchController', 'matches');
 $server->addClass('TeamController', 'teams');
