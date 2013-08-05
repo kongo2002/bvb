@@ -13,10 +13,25 @@ class Login
 {
     public function __construct($database)
     {
+        /* create/open session */
+        session_start();
+
         $this->db = $database;
 
-        $this->userId = 0;
-        $this->loggedIn = false;
+        if (!empty($_SESSION['user']) &&
+            !empty($_SESSION['userId']) &&
+            !empty($_SESSION['loggedIn']))
+        {
+            $this->loggedIn = true;
+            $this->userId = $_SESSION['userId'];
+            $this->user = $_SESSION['user'];
+        }
+        else
+        {
+            $this->loggedIn = false;
+            $this->userId = 0;
+            $this->user = '';
+        }
     }
 
     public function login($user, $password)
@@ -38,14 +53,25 @@ class Login
         if ($match)
         {
             $id = $match['id'];
+            $user = $match['user'];
 
             $this->userId = $id;
             $this->loggedIn = true;
 
-            return new User($id, $match['user']);
+            /* fill session */
+            $_SESSION['user'] = $user;
+            $_SESSION['userId'] = $id;
+            $_SESSION['loggedIn'] = true;
+
+            return new User($id, $user);
         }
 
         return null;
+    }
+
+    public function isLoggedIn()
+    {
+        return $this->loggedIn;
     }
 }
 

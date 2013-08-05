@@ -134,18 +134,11 @@ class RestServer
                 if (method_exists($obj, 'init'))
                     $obj->init();
 
-                # method uses authorization
-                if (!$noAuth && method_exists($obj, 'authorize'))
-                {
-                    if (!$obj->authorize())
-                    {
-                        $this->sendData($this->unauthorized(true));
-                        exit;
-                    }
-                }
+                $doAuth = !$noAuth && method_exists($obj, 'authorize');
 
                 # method uses database
-                if (!$noDb)
+                # authorization implicitely requires database access
+                if (!$noDb || $doAuth)
                 {
                     try
                     {
@@ -156,6 +149,16 @@ class RestServer
                     {
                         return $this->sendError($e->getCode(),
                             'failed to initialize database connection');
+                    }
+                }
+
+                # method uses authorization
+                if ($doAuth)
+                {
+                    if (!$obj->authorize())
+                    {
+                        $this->sendData($this->unauthorized(true));
+                        exit;
                     }
                 }
 
