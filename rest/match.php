@@ -371,12 +371,13 @@ class Match
     }
 }
 
-class MatchController
+class MatchController extends AuthController
 {
     /**
      * Get a short match information
      *
      * @url GET /match/$id
+     * @noAuth
      */
     public function getMatch($id)
     {
@@ -400,6 +401,7 @@ class MatchController
      * Get a list of all matches
      *
      * @url GET /
+     * @noAuth
      */
     public function getMatchList()
     {

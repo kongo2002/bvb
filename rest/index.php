@@ -5,6 +5,7 @@ require_once('server.php');
 
 # load controllers
 require_once('base.php');
+require_once('auth.php');
 require_once('player.php');
 require_once('match.php');
 require_once('team.php');
