@@ -23,14 +23,12 @@ class Login
             !empty($_SESSION['loggedIn']))
         {
             $this->loggedIn = true;
-            $this->userId = $_SESSION['userId'];
-            $this->user = $_SESSION['user'];
+            $this->user = new User($_SESSION['userId'], $_SESSION['user']);
         }
         else
         {
             $this->loggedIn = false;
-            $this->userId = 0;
-            $this->user = '';
+            $this->user = null;
         }
     }
 
@@ -52,18 +50,17 @@ class Login
         # the login succeeded
         if ($match)
         {
-            $id = $match['id'];
-            $user = $match['user'];
+            $user = new User($match['id'], $match['user']);
 
-            $this->userId = $id;
             $this->loggedIn = true;
+            $this->user = $user;
 
             /* fill session */
-            $_SESSION['user'] = $user;
-            $_SESSION['userId'] = $id;
+            $_SESSION['user'] = $user->user;
+            $_SESSION['userId'] = $user->id;
             $_SESSION['loggedIn'] = true;
 
-            return new User($id, $user);
+            return $user;
         }
 
         return null;
@@ -75,8 +72,7 @@ class Login
         session_destroy();
 
         $this->loggedIn = false;
-        $this->userId = 0;
-        $this->user = '';
+        $this->user = null;
     }
 
     public function isLoggedIn()
@@ -105,10 +101,16 @@ class BaseController
      */
     public function login($data)
     {
+        $login = new Login($this->database);
+
+        # if the user is already logged in
+        # just return the user information
+        if ($login->isLoggedIn())
+            return $login->user;
+
         if (!$data || !$data->user || !$data->password)
             throw new ApiException('invalid username/password given');
 
-        $login = new Login($this->database);
         $user = $login->login($data->user, $data->password);
 
         if ($user)
