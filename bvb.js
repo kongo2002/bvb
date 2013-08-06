@@ -470,22 +470,29 @@ $(function() {
         ko.applyBindings(bvb);
     });
 
+    var loginDialog = $('#loginDialog');
+
     /* initialize alert box */
     $('#alertdiv .close').on('click', function() {
         $(this).parent().removeClass('in');
     });
 
+    /* initialize welcome menu item */
+    $('#welcome').on('click', function() {
+        if (!bvb.loggedIn())
+            loginDialog.modal('show');
+    });
+
     /* initialize login form */
-    $('#loginDialog').on('submit', function(ev) {
+    loginDialog.on('submit', function(ev) {
         /* deactivate default button behavior */
         ev.preventDefault();
 
-        var formDiv = $(this);
         var user = $('#user').val();
         var pw = $('#password').val();
 
         bvb.login(user, pw, function() {
-            formDiv.modal('hide');
+            loginDialog.modal('hide');
         });
     });
 });
