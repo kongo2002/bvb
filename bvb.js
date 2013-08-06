@@ -11,7 +11,7 @@ var Utils = {
 
         return year + '-' + this.zeroFilled(month) + '-' + this.zeroFilled(day);
     },
-    call : function(path, callback, data, mtd) {
+    call : function(path, callback, data, mtd, overrideError) {
         var method = (!mtd) ? (!data) ? 'GET' : 'POST' : mtd;
         var url = 'rest/' + path;
 
@@ -20,13 +20,17 @@ var Utils = {
                 ? error
                 : method + ' "' + url + '" failed unexpectedly';
 
-            console.error(msg);
+            if (overrideError && typeof overrideError === 'function') {
+                overrideError(error);
+            } else {
+                console.error(msg);
 
-            /* show alert box */
-            var box = $('#alertdiv');
-            if (box) {
-                box.find('span').text(msg);
-                box.addClass('in');
+                /* show alert box */
+                var box = $('#alertdiv');
+                if (box) {
+                    box.find('span').text(msg);
+                    box.addClass('in');
+                }
             }
         }
 
@@ -411,10 +415,22 @@ BVB.prototype.init = function(callback) {
     this.loadPlayers(chain);
     this.loadMatches(chain);
     this.loadTeams(chain);
-    this.login(null, null, chain);
+    this.checkLogin(chain);
 };
 
-BVB.prototype.login = function(user, password, callback) {
+BVB.prototype.checkLogin = function(callback) {
+    var self = this;
+
+    /* the login check may fail
+     * that's why we pass a error callback that itself
+     * triggers its own callback function (used in the init chain) */
+    this.login(null, null, callback, function(x) {
+        if (callback && typeof callback === 'function')
+            callback.call(self, x);
+    });
+};
+
+BVB.prototype.login = function(user, password, callback, onError) {
     var self = this;
     var data = null;
 
@@ -434,7 +450,7 @@ BVB.prototype.login = function(user, password, callback) {
         /* invoke callback if given */
         if (callback && typeof callback === 'function')
             callback.call(self, x);
-    }, data, 'POST');
+    }, data, 'POST', onError);
 };
 
 BVB.prototype.logout = function(callback) {
