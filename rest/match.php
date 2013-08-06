@@ -434,9 +434,10 @@ class MatchController extends AuthController
         if ($data === null)
             throw new ApiException('no or invalid match object given');
 
-        $success = Match::update($this->database, $data);
+        if (!Match::update($this->database, $data))
+            throw new ApiException('match update failed unexpectedly');
 
-        return $success;
+        return true;
     }
 
     /**
@@ -446,9 +447,10 @@ class MatchController extends AuthController
      */
     public function deleteMatch($id)
     {
-        $success = Match::delete($this->database, $id);
+        if (!Match::delete($this->database, $id))
+            throw new ApiException('match removal failed unexpectedly');
 
-        return $success;
+        return true;
     }
 }
 

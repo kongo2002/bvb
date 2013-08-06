@@ -12,8 +12,12 @@ class SafePDO extends PDO
 
     public static function create()
     {
+        # UPDATE statements should return the number of matched rows
+        # and not the actual modified ones (in case the data has not changed)
+        $opts = array(PDO::MYSQL_ATTR_FOUND_ROWS => true);
+
         return new SafePDO('mysql:host='.DB_SERVER.';dbname='.DB_DATABASE,
-            DB_USER, DB_PW);
+            DB_USER, DB_PW, $opts);
     }
 
     public function __construct($conn, $user='', $pw='', $options=array())
