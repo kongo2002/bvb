@@ -406,15 +406,22 @@ BVB.prototype.getPlayers = function(playerIds) {
 };
 
 BVB.prototype.init = function(callback) {
-    var chain = Utils.chainer(3, callback, this);
+    var chain = Utils.chainer(4, callback, this);
 
     this.loadPlayers(chain);
     this.loadMatches(chain);
     this.loadTeams(chain);
+    this.login(null, null, chain);
 };
 
 BVB.prototype.login = function(user, password, callback) {
     var self = this;
+    var data = null;
+
+    /* if we pass 'null' as login information we simply request
+     * if the user is already logged in via a session cookie */
+    if (user && password)
+        data = { user: user, password: password };
 
     /* trigger authorization call */
     Utils.call('login', function(x) {
@@ -427,7 +434,7 @@ BVB.prototype.login = function(user, password, callback) {
         /* invoke callback if given */
         if (callback && typeof callback === 'function')
             callback.call(self, x);
-    }, { user: user, password: password });
+    }, data, 'POST');
 };
 
 BVB.prototype.logout = function(callback) {
