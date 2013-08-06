@@ -425,9 +425,22 @@ BVB.prototype.login = function(user, password, callback) {
             self.user(x.user);
 
         /* invoke callback if given */
-        if (callback)
+        if (callback && typeof callback === 'function')
             callback.call(self, x);
     }, { user: user, password: password });
+};
+
+BVB.prototype.logout = function(callback) {
+    var self = this;
+
+    Utils.call('logout', function(x) {
+        self.loggedIn(false);
+        self.user('');
+
+        /* invoke callback if given */
+        if (callback && typeof callback === 'function')
+            callback.call(self, x);
+    }, null, 'POST');
 };
 
 $(function() {

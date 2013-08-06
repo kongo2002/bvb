@@ -69,6 +69,16 @@ class Login
         return null;
     }
 
+    public function logout()
+    {
+        $_SESSION = array();
+        session_destroy();
+
+        $this->loggedIn = false;
+        $this->userId = 0;
+        $this->user = '';
+    }
+
     public function isLoggedIn()
     {
         return $this->loggedIn;
@@ -105,6 +115,19 @@ class BaseController
             return $user;
 
         throw new ApiException('there is no valid match for the given user/password');
+    }
+
+    /**
+     * Perform a session logout.
+     *
+     * @url POST /logout
+     */
+    public function logout()
+    {
+        $login = new Login($this->database);
+        $login->logout();
+
+        return true;
     }
 }
 
