@@ -29,6 +29,14 @@ class MatchUp
     {
         return MatchUp::addPlayer($db, $player, $match, true);
     }
+
+    public static function deleteMatch($db, $id)
+    {
+        $cmd = $db->prepare('DELETE FROM matchup WHERE `match`=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        return $cmd->rowCount() > 0;
+    }
 }
 
 ?>

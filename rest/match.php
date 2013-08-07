@@ -346,9 +346,19 @@ class Match
             ':og' => $match->opponentGoals,
             ':id' => $match->id));
 
-        /* TODO: update events and players */
+        $success = $cmd->rowCount() > 0;
 
-        return $cmd->rowCount() > 0;
+        MatchUp::deleteMatch($db, $match->id);
+
+        foreach ($match->starters as $player)
+            MatchUp::addStarter($db, $player, $match->id);
+
+        foreach ($match->substitutes as $player)
+            MatchUp::addSubstitution($db, $player, $match->id);
+
+        /* TODO: update events */
+
+        return $success;
     }
 
     public static function delete($db, $id)
@@ -357,8 +367,7 @@ class Match
             throw new ApiException('no or invalid ID given');
 
         /* delete events and matchup */
-        $cmd = $db->prepare('DELETE FROM matchup WHERE `match`=:id;');
-        $cmd->execute(array(':id' => $id));
+        MatchUp::deleteMatch($db, $id);
 
         $cmd = $db->prepare('DELETE FROM matchevents WHERE `match`=:id;');
         $cmd->execute(array(':id' => $id));
