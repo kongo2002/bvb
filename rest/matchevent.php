@@ -33,6 +33,14 @@ class MatchEvent
 
         return true;
     }
+
+    public static function deleteMatch($db, $id)
+    {
+        $cmd = $db->prepare('DELETE FROM matchevents WHERE `match`=:id;');
+        $cmd->execute(array(':id' => $id));
+
+        return $cmd->rowCount() > 0;
+    }
 }
 
 ?>

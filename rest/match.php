@@ -349,6 +349,7 @@ class Match
         $success = $cmd->rowCount() > 0;
 
         MatchUp::deleteMatch($db, $match->id);
+        MatchEvent::deleteMatch($db, $match->id);
 
         foreach ($match->starters as $player)
             MatchUp::addStarter($db, $player, $match->id);
@@ -356,7 +357,7 @@ class Match
         foreach ($match->substitutes as $player)
             MatchUp::addSubstitution($db, $player, $match->id);
 
-        /* TODO: update events */
+        Match::processEvents($db, $match->id, $match);
 
         return $success;
     }
@@ -368,9 +369,7 @@ class Match
 
         /* delete events and matchup */
         MatchUp::deleteMatch($db, $id);
-
-        $cmd = $db->prepare('DELETE FROM matchevents WHERE `match`=:id;');
-        $cmd->execute(array(':id' => $id));
+        MatchEvent::deleteMatch($db, $id);
 
         /* delete match itself */
         $cmd = $db->prepare('DELETE FROM matches WHERE id=:id;');
