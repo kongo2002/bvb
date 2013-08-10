@@ -1,5 +1,30 @@
 <?php
 
+class PlayerScoreInfo
+{
+    public function __construct($id, $goal, $assist)
+    {
+        $this->id = $id;
+        $this->goal = $goal;
+        $this->assist = $assist;
+    }
+
+    public static function get($db, $id)
+    {
+        $cmd = $db->prepare('SELECT goal,assist FROM players '.
+            'INNER JOIN positions ON players.position=positions.id '.
+            'WHERE players.id=:id;');
+
+        $cmd->execute(array(':id' => $id));
+
+        $info = $cmd->fetch(PDO::FETCH_ASSOC);
+
+        return new PlayerScoreInfo($id,
+            $info['goal'],
+            $info['assist']);
+    }
+}
+
 class Player
 {
     public static function getList($db)
@@ -51,6 +76,58 @@ class Player
 
         return $cmd->fetchColumn() == $len;
     }
+
+    private static function calculateRow($row, $info)
+    {
+        $goalScore = $row['goalCount'] * $info->goal;
+        $assistScore = $row['assistCount'] * $info->assist;
+
+        return $goalScore + $assistScore;
+    }
+
+    public static function calculateMatch($db, $player, $match, $scoreInfo = null)
+    {
+        $info = ($scoreInfo) ? $scoreInfo : PlayerScoreInfo::get($db, $player);
+
+        $query = 'SELECT count(goals) AS goalCount, count(assists) AS assistCount '.
+            'FROM matches INNER JOIN matchevents ON matches.id=`match` '.
+            'WHERE matches.id=:id AND player=:p GROUP BY goals,assists;';
+
+        $cmd = $db->prepare($query);
+        $cmd->execute(array(':id' => $match, ':p' => $player));
+
+        $score = $cmd->fetch(PDO::FETCH_ASSOC);
+
+        return Player::calculateRow($score, $info);
+    }
+
+    public static function calculateMatches($db, $player, $matches, $scoreInfo = null)
+    {
+        $info = ($scoreInfo) ? $scoreInfo : PlayerScoreInfo::get($db, $player);
+
+        $ids = implode(',', $matches);
+        $query = 'SELECT matches.id AS id, count(goals) AS goalCount, count(assists) AS assistCount '.
+            'FROM matches INNER JOIN matchevents ON matches.id=`match` '.
+            'WHERE matches.id IN ('.$ids.') AND player=:p GROUP BY goals,assists '.
+            'ORDER BY date ASC;';
+
+        $cmd = $db->prepare($query);
+        $cmd->execute(array(':p' => $player));
+
+        $matches = array();
+
+        foreach ($cmd->fetchAll(PDO::FETCH_ASSOC) as $score)
+        {
+            $match = array();
+
+            $match['id'] = $score['id'];
+            $match['score'] = Player::calculateRow($score, $info);
+
+            $matches[] = $match;
+        }
+
+        return $matches;
+    }
 }
 
 class Position
@@ -70,7 +147,7 @@ class PlayerController
      *
      * @url GET /
      */
-    public function playerList($db)
+    public function playerList()
     {
         return Player::getList($this->database);
     }
@@ -93,6 +170,16 @@ class PlayerController
     public function positions()
     {
         return Position::getAll($this->database);
+    }
+
+    /**
+     * Get match information for a specific match
+     *
+     * @url GET /player/$id/matches/match/$mid
+     */
+    public function playerMatch($id, $mid)
+    {
+        return Player::calculateMatch($this->database, $id, $mid);
     }
 }
 
