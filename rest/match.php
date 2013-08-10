@@ -94,6 +94,13 @@ class Match
         return array_map($func, $cmd->fetchAll(PDO::FETCH_NUM));
     }
 
+    public static function getIds($db)
+    {
+        $cmd = $db->query('SELECT id FROM matches;');
+
+        return array_map(function($row) { return $row['id']; }, $cmd->fetchAll(PDO::FETCH_ASSOC));
+    }
+
     public static function getMatchEvents($db, $id)
     {
         # get match events

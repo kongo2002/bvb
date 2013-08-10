@@ -107,8 +107,9 @@ class Player
 
         $ids = implode(',', $matches);
         $query = 'SELECT matches.id AS id, count(goals) AS goalCount, count(assists) AS assistCount '.
-            'FROM matches INNER JOIN matchevents ON matches.id=`match` '.
-            'WHERE matches.id IN ('.$ids.') AND player=:p GROUP BY goals,assists '.
+            'FROM matches LEFT OUTER JOIN matchevents ON matches.id=`match` '.
+            'WHERE matches.id IN ('.$ids.') AND (player IS NULL OR player=:p) '.
+            'GROUP BY goals,assists '.
             'ORDER BY date ASC;';
 
         $cmd = $db->prepare($query);
@@ -118,10 +119,15 @@ class Player
 
         foreach ($cmd->fetchAll(PDO::FETCH_ASSOC) as $score)
         {
+            $hasPlayed = $score['goalCount'] != null && $score['assistCount'] != null;
+
             $match = array();
 
             $match['id'] = $score['id'];
-            $match['score'] = Player::calculateRow($score, $info);
+            $match['score'] = $hasPlayed
+                ? Player::calculateRow($score, $info)
+                : 0;
+            $match['played'] = $hasPlayed;
 
             $matches[] = $match;
         }
@@ -180,6 +186,19 @@ class PlayerController
     public function playerMatch($id, $mid)
     {
         return Player::calculateMatch($this->database, $id, $mid);
+    }
+
+    /**
+     * Get match information for a specific match
+     *
+     * @url GET /player/$id/matches
+     */
+    public function playerMatches($id)
+    {
+        $db = $this->database;
+        $matches = Match::getIds($db);
+
+        return Player::calculateMatches($db, $id, $matches);
     }
 }
 
