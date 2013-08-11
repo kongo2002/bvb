@@ -58,4 +58,107 @@ Utils =
       data: postData
     )
 
+  contains: (array, elem) ->
+    if array && element
+      array.some (x) -> x is elem
+    false
+
+  pluck: (array, prop) ->
+    elem[prop] for elem in array
+
+class Goal
+  constructor: (id) ->
+    @player = ko.observable(id || 0)
+
+class Assist
+  constructor: (id) ->
+    @player = ko.observable(id || 0)
+
+class Match
+  constructor: (@bvb) ->
+    @id = ko.observable(0)
+    @date = ko.observable(new Date())
+    @opponent = ko.observable(0)
+    @opponentGoals = ko.observable(0)
+    @homegame = ko.observable(true)
+    @goals = ko.observableArray()
+    @assists = ko.observableArray()
+    @startingPlayers = ko.observableArray()
+    @substitutePlayers = ko.observableArray()
+
+    @goalCandidates = ko.computed =>
+      candidates = []
+      $.each @startingPlayers(), (_, p) -> candidates.push p
+      $.each @startingPlayers(), (_, p) ->
+        candidates.push p unless Utils.contains candidates, p
+      candidates
+
+    @substitutionCandidates = ko.computed =>
+      candidates = []
+      starters = @startingPlayers()
+      $.each @bvb.players(), (_, p) ->
+        candidates.push p unless Utils.contains candidates, p
+      candidates
+
+    @computedGoals = ko.computed =>
+      @goals().filter((g) -> g.player() > 0).length
+
+    @computedAssists = ko.computed =>
+      @assists().filter((a) -> a.player() > 0).length
+
+    @numPlayers = ko.computed =>
+      @startingPlayers().length
+
+    @numSubstitutes = ko.computed =>
+      @substitutePlayers().length
+
+    @isValid = ->
+      substitutes = @numSubstitutes()
+
+      @opponent() and
+        substitutes >= 0 and
+        substitutes <= 3 and
+        @numPlayers() == 11
+
+    @isNewMatch -> @id < 1
+
+    @name = ko.computed =>
+      opp = @opponent()
+      if opp > 0
+        team = @bvb.getTeam opp
+        if team
+          return team.name
+      ''
+
+    @actionName = ko.computed =>
+      if @isNewMatch() then 'Add match' else 'Edit match'
+
+    @matchName = ko.computed =>
+      team = 'Borussia Dortmund'
+      if @isNewMatch()
+        ''
+      else if @homegame()
+        "#{team} : #{@name()} - #{@computedGoals()} : #{@opponentGoals()}"
+      else
+        "#{@name()} : #{team} - #{@opponentGoals()} : #{@computedGoals()}"
+
+    @save = =>
+      dto = @toDto()
+
+      if @isNewMatch()
+        Utils.call('matches/match', (m) =>
+          @id(m.id)
+        , dto)
+      else
+        Utils.call('matches/match', null, dto, 'PUT')
+
+    @addGoal = => @goals.push new Goal()
+
+    @addAssist = => @assists.push new Assist()
+
+    @removeGoal = (g) => @goals.remove g
+
+    @removeAssist = (a) => @assist.remove a
+
+
 # vim: set et sts=2 sw=2:
