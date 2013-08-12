@@ -160,5 +160,63 @@ class Match
 
     @removeAssist = (a) => @assist.remove a
 
+  toDto: ->
+    getPlayer = (elem) ->
+      id: elem.player()
+
+    return (
+      id            : @id()
+      opponent      : @opponent()
+      homegame      : @homegame()
+      date          : @date()
+      opponentGoals : @opponentGoals()
+      starters      : @startingPlayers()
+      substitutes   : @substitutePlayers()
+      goals         : @goals().map getPlayer
+      assists       : @assists().map getPlayer
+    )
+
+  fromDto: (dto, bvb) ->
+    m = new Match bvb
+
+    m.id dto.id
+    m.homegame dto.homegame
+    m.opponent dto.opponent
+    m.opponentGoals dto.opponentGoals
+    m.date dto.date
+
+    m.startingPlayers Utils.pluck dto.starters, 'id' if dto.starters
+    m.substitutePlayers Utils.pluck dto.substitutes, 'id' if dto.substitutes
+
+    if dto.goals
+      m.goals dto.goals.map (x) -> new Goal x.id
+
+    if dto.assists
+      m.assists dto.assists.map (x) -> new Assist x.id
+
+    m
+
+class Admin
+
+  constructor: (@bvb) ->
+
+    @selectedMatch = ko.observable()
+    @match = ko.observable(new Match @bvb)
+
+    @selectedMatch.subscribe (sel) =>
+      if sel and sel.id
+        Utils.call "matches/match/#{sel.id}", (m) =>
+          @match Match.fromDto m, @bvb
+      else
+        @match new Match @bvb
+
+  remove: ->
+    m = @match()
+
+    if not m.isNewMatch()
+      Utils.call("matches/match/#{m.id()}", =>
+        # refresh match list
+        @bvb.loadMatches => @selectedMatch null
+      , null, 'DELETE')
 
 # vim: set et sts=2 sw=2:
