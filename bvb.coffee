@@ -11,7 +11,7 @@ Utils =
     "#{year}-#{fmt month}-#{fmt day}"
 
   call: (path, callback, data, mtd, error) ->
-    method = mtd ? (if data? then 'GET' else 'POST')
+    method = mtd ? (if data? then 'POST' else 'GET')
     url = "rest/#{path}"
 
     failure = (e) ->
@@ -51,7 +51,7 @@ Utils =
           JSON.stringify(data)
       else null
 
-    $.ajax(
+    $.ajax(url,
       type: method
       success: onSuccess
       error: onFailure
@@ -62,11 +62,11 @@ Utils =
     finished = 0
     () ->
       finished += 1
-      if callback and finished >= count
-        callback.call ctx
+      if cb and finished >= count
+        cb.call ctx
 
   contains: (array, elem) ->
-    if array and element
+    if array and elem
       array.some (x) -> x is elem
     false
 
@@ -132,8 +132,6 @@ class Match
         substitutes <= 3 and
         @numPlayers() == 11
 
-    @isNewMatch -> @id < 1
-
     @name = ko.computed =>
       opp = @opponent()
       if opp > 0
@@ -172,7 +170,9 @@ class Match
 
     @removeAssist = (a) => @assist.remove a
 
-  toDto: ->
+  isNewMatch: -> @id < 1
+
+  @toDto: ->
     getPlayer = (elem) ->
       id: elem.player()
 
@@ -188,7 +188,7 @@ class Match
       assists       : @assists().map getPlayer
     )
 
-  fromDto: (dto, bvb) ->
+  @fromDto: (dto, bvb) ->
     m = new Match bvb
 
     m.id dto.id
@@ -245,7 +245,7 @@ class BVB
     @welcome = ko.computed =>
       if @loggedIn() then "Welcome, #{@user()}" else 'Login'
 
-  loadPlayers: (cb) =>
+  loadPlayers: (cb) ->
     Utils.call 'players', (ps) =>
       @players.removeAll()
       $.each ps, (_, p) => @players.push p
@@ -253,7 +253,7 @@ class BVB
       # invoke callback if given
       cb.call @, ps if cb
 
-  loadTeams: (cb) =>
+  loadTeams: (cb) ->
     Utils.call 'teams', (ts) =>
       @teams.removeAll()
       $.each ts, (_, t) => @teams.push t
@@ -261,7 +261,7 @@ class BVB
       # invoke callback if given
       cb.call @, ts if cb
 
-  loadMatches: (cb) =>
+  loadMatches: (cb) ->
     team = 'Borussia Dortmund'
 
     match = (m) -> (
@@ -300,7 +300,7 @@ class BVB
     @checkLogin  chain
 
   login: (user, pw, cb, err) ->
-    data = user: user, password: pw if user and pw
+    data = if user and pw then user: user, password: pw else null
 
     Utils.call 'login', (x) =>
       @loggedIn true
@@ -334,7 +334,7 @@ $ ->
   # initialize main BVB instance
   bvb = new BVB
   bvb.init ->
-    bvb.admin = new ko.observable(new Admin bvb)
+    bvb.admin = ko.observable(new Admin bvb)
 
     ko.bindingHandlers.datepicker =
       init: (elem, vAcc, allBAcc) ->
@@ -349,7 +349,7 @@ $ ->
         widget.setValue ko.utils.unwrapObservable vAcc() if widget
 
     # apply knockout MVVM bindings after initialization
-    ko.applyBindings()
+    ko.applyBindings bvb
 
   loginDialog = $('#loginDialog')
 
