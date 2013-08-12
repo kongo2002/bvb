@@ -58,13 +58,25 @@ Utils =
       data: postData
     )
 
+  chainer: (count, cb, ctx) ->
+    finished = 0
+    () ->
+      finished += 1
+      if callback and finished >= count
+        callback.call ctx
+
   contains: (array, elem) ->
-    if array && element
+    if array and element
       array.some (x) -> x is elem
     false
 
   pluck: (array, prop) ->
     elem[prop] for elem in array
+
+  first: (array, pred) ->
+    if array and pred
+      return elem for elem in array when pred elem
+    null
 
 class Goal
   constructor: (id) ->
@@ -218,5 +230,73 @@ class Admin
         # refresh match list
         @bvb.loadMatches => @selectedMatch null
       , null, 'DELETE')
+
+class BVB
+
+  constructor: ->
+
+    @matches = ko.observableArray()
+    @players = ko.observableArray()
+    @teams = ko.observableArray()
+
+    @loggedIn = ko.observable(false)
+    @user = ko.observable('')
+
+    @welcome = ko.computed =>
+      if @loggedIn() then "Welcome, #{@user()}" else 'Login'
+
+  loadPlayers: (cb) =>
+    Utils.call 'players', (ps) =>
+      @players.removeAll()
+      $.each ps, (_, p) => @players.push p
+
+      # invoke callback if given
+      cb.call @, ps if cb
+
+  loadTeams: (cb) =>
+    Utils.call 'teams', (ts) =>
+      @teams.removeAll()
+      $.each ts, (_, t) => @teams.push t
+
+      # invoke callback if given
+      cb.call @, ts if cb
+
+  loadMatches: (cb) =>
+    team = 'Borussia Dortmund'
+
+    match = (m) -> (
+      id: m.id
+      date: m.date
+      showName: "#{m.opponent} (#{m.date})"
+      name: if m.homegame then "#{team} : #{m.opponent}" else "#{m.opponent} : #{team}"
+      result: m.result
+    )
+
+    Utils.call 'matches', (ms) =>
+      @matches.removeAll()
+      $.each ms, (_, m) => @matches.push match m
+
+      # invoke callback if given
+      cb.call @, ms if cb
+
+  getTeam: (id) ->
+    teams = @teams()
+    Utils.first teams, (t) -> t.id == id
+
+  getPlayer: (id) ->
+    players = @players()
+    Utils.first players, (p) -> p.id == id
+
+  getPlayers: (ids) ->
+    @players().filter (p) ->
+      ids.indexOf p.id != -1
+
+  init: (cb) ->
+    chain = Utils.chainer 4, cb, @
+
+    @loadPlayers chain
+    @loadMatches chain
+    @loadTeams   chain
+    @checkLogin  chain
 
 # vim: set et sts=2 sw=2:
