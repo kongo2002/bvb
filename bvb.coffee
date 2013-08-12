@@ -321,4 +321,55 @@ class BVB
       cb.call @, x if cb and typeof cb is 'function'
     , null, 'POST'
 
+$ ->
+  # global AJAX setup
+  $.ajaxSetup
+    url: 'index.php'
+    contentType: 'application/json; charset=utf-8'
+    dataType: 'json'
+    cache: false
+    timeout: 5000
+    processData: false
+
+  # initialize main BVB instance
+  bvb = new BVB
+  bvb.init ->
+    bvb.admin = new ko.observable(new Admin bvb)
+
+    ko.bindingHandlers.datepicker =
+      init: (elem, vAcc, allBAcc) ->
+        $(elem).datepicker format: 'yyyy-mm-dd'
+
+        ko.utils.registerEventHandler elem, 'changeDate', (ev) ->
+          value = vAcc()
+          value ev.date if ko.isObservable(value)
+
+      update: (elem, vAcc) ->
+        widget = $(elem).data 'datepicker'
+        widget.setValue ko.utils.unwrapObservable vAcc() if widget
+
+    # apply knockout MVVM bindings after initialization
+    ko.applyBindings()
+
+  loginDialog = $('#loginDialog')
+
+  # initialize alert box
+  $('#alertdiv .close').on 'click', ->
+    $(@).parent().removeClass 'in'
+
+  # initialize welcome menu item
+  $('#welcome').on 'click', ->
+    loginDialog.modal 'show' if not bvb.loggedIn()
+
+  # initialize login form
+  loginDialog.on 'submit', (ev) ->
+    # deactivate default button behavior
+    ev.preventDefault()
+
+    user = $('#user').val()
+    pw = $('#password').val()
+
+    bvb.login user, pw, ->
+      loginDialog.modal 'hide'
+
 # vim: set et sts=2 sw=2:
