@@ -101,15 +101,15 @@ class Match
     @goalCandidates = ko.computed =>
       candidates = []
       $.each @startingPlayers(), (_, p) -> candidates.push p
-      $.each @startingPlayers(), (_, p) ->
+      $.each @substitutePlayers(), (_, p) ->
         candidates.push p unless Utils.contains candidates, p
-      candidates
+      @bvb.getPlayers candidates
 
     @substitutionCandidates = ko.computed =>
       candidates = []
       starters = @startingPlayers()
       $.each @bvb.players(), (_, p) ->
-        candidates.push p unless Utils.contains candidates, p
+        candidates.push p unless Utils.contains starters, p
       candidates
 
     @computedGoals = ko.computed =>
