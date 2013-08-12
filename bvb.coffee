@@ -299,4 +299,26 @@ class BVB
     @loadTeams   chain
     @checkLogin  chain
 
+  login: (user, pw, cb, err) ->
+    data = user: user, password: pw if user and pw
+
+    Utils.call 'login', (x) =>
+      @loggedIn true
+      @user x.user if x.user
+
+      cb.call @, x if cb and typeof cb is 'function'
+    , data, 'POST', err
+
+  checkLogin: (cb) ->
+    @login null, null, cb, (x) =>
+      cb.call @, x if cb and typeof cb is 'function'
+
+  logout: (cb) ->
+    Utils.call 'logout', (x) =>
+      @loggedIn false
+      @user ''
+
+      cb.call @, x if cb and typeof cb is 'function'
+    , null, 'POST'
+
 # vim: set et sts=2 sw=2:
